@@ -27,14 +27,19 @@ interface Project {
 const projects: Project[] = [
   {
     id: 1,
-    title: "Restaurant Landing Page",
+    title: "Gopaddi ",
     description:
-      "An elegant and modern landing page crafted to highlight your restaurant's unique offerings, with sections for featured dishes, chef specials, operating hours, and contact information",
-    image:
-      "/68747470733a2f2f692e6962622e636f2f356a78424b70772f696d6167652e706e67.png",
-    technologies: ["React", "Next.js", "Tailwind CSS", "Redux"],
-    liveUrl: "https://gerich-resturants.vercel.app/",
-    githubUrl: "https://github.com/Oluwasegun1/gerich-resturants",
+      "Built the frontend of GoPaddi, a travel ecosystem combining social features with booking services. Implemented responsive UIs for live streaming, trip planning, and marketplace interactions.",
+    image: "/gopaddi.png",
+    technologies: [
+      "React",
+      "Axios",
+      "API Integration",
+      "Tailwind CSS",
+      "Next.Js",
+    ],
+    liveUrl: "https://www.gopaddi.com/",
+    githubUrl: "https://www.gopaddi.com/",
   },
   {
     id: 2,
@@ -48,23 +53,42 @@ const projects: Project[] = [
   },
   {
     id: 3,
+    title: "DiscovaTrips ",
+    description:
+      "Discovatrips is a travel discovery platform that helps users explore curated trips, view travel highlights, and connect with experiences shared by other travelers",
+    image: "/discova.png",
+    technologies: [
+      "React",
+      "Axios",
+      "API Integration",
+      "Tailwind CSS",
+      "Next.Js",
+      "framer-motion",
+    ],
+    liveUrl: "https://www.discovatrips.com",
+    githubUrl: "https://www.discovatrips.com",
+  },
+  {
+    id: 4,
+    title: "Restaurant Landing Page",
+    description:
+      "An elegant and modern landing page crafted to highlight your restaurant's unique offerings, with sections for featured dishes, chef specials, operating hours, and contact information",
+    image:
+      "/68747470733a2f2f692e6962622e636f2f356a78424b70772f696d6167652e706e67.png",
+    technologies: ["React", "Next.js", "Tailwind CSS", "Redux"],
+    liveUrl: "https://gerich-resturants.vercel.app/",
+    githubUrl: "https://github.com/Oluwasegun1/gerich-resturants",
+  },
+  {
+    id: 5,
     title: "React Job Platform",
     description:
       "A responsive portfolio website showcasing creative work with smooth animations and interactive elements.",
-    image: "job.png",
+    image: "/job.png",
     technologies: ["React", "Tailwind CSS"],
     liveUrl: "https://react-jobs-iota-flax.vercel.app/",
     githubUrl: "https://github.com/Oluwasegun1/react-jobs",
   },
-  // {
-  //   id: 4,
-  //   title: "Weather Dashboard",
-  //   description: "An interactive weather dashboard with real-time data visualization and location-based forecasts.",
-  //   image: "/placeholder.svg?height=300&width=500",
-  //   technologies: ["React", "Chart.js", "API Integration", "CSS"],
-  //   liveUrl: "https://example.com",
-  //   githubUrl: "https://github.com/yourusername/project4",
-  // },
 ];
 
 export default function Projects() {
@@ -220,7 +244,7 @@ export default function Projects() {
                       rel="noopener noreferrer"
                       className="flex items-center justify-center gap-2"
                     >
-                      <span>Live Demo</span>
+                      <span>Live</span>
                       <ExternalLink className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1 group-hover:-translate-y-1" />
                       <span className="absolute inset-0 bg-white/20 transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></span>
                     </a>

@@ -1,8 +1,8 @@
-import Hero from "@/components/hero"
-import Projects from "@/components/projects"
-import Skills from "@/components/skills"
-import Contact from "@/components/contact"
-import StarfieldBackground from "@/components/starfield-background"
+import Hero from "@/components/hero";
+import Projects from "@/components/projects";
+import Skills from "@/components/skills";
+import Contact from "@/components/contact";
+import StarfieldBackground from "@/components/starfield-background";
 
 export default function Home() {
   return (
@@ -15,5 +15,5 @@ export default function Home() {
         <Contact />
       </div>
     </main>
-  )
+  );
 }
