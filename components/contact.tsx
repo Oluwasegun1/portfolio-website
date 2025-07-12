@@ -176,14 +176,14 @@ export default function Contact() {
                 </div>
               </motion.div>
 
-              <div className="mt-8 h-40 w-full overflow-hidden rounded-lg">
+              {/* <div className="mt-8 h-40 w-full overflow-hidden rounded-lg">
                 <div className="h-full w-full bg-gray-200 dark:bg-gray-800 relative">
                   {hasMounted && <div className="absolute inset-0"></div>}
                   <div className="absolute inset-0 flex items-center justify-center">
                     <MapPin className="h-12 w-12 text-primary/50" />
                   </div>
                 </div>
-              </div>
+              </div> */}
             </CardContent>
           </Card>
         </motion.div>

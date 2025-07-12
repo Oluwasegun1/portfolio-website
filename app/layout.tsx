@@ -10,15 +10,15 @@ import { Metadata } from "next";
 const inter: ReturnType<typeof Inter> = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "OluwaWebs Portfolio",
+  title: "Devvo Portfolio",
   description: "A showcase of my web development projects and skills",
   icons: {
     icon: [
-      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
-      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-96x96.png", sizes: "96x96", type: "image/png" },
-      { url: "/favicon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/favicon-512x512.png", sizes: "512x512", type: "image/png" },
+      { url: "/app/devvo.png", sizes: "16x16", type: "image/png" },
+      { url: "/app/devvo.png", sizes: "32x32", type: "image/png" },
+      { url: "/app/devvo.png", sizes: "96x96", type: "image/png" },
+      { url: "/app/devvo.png", sizes: "192x192", type: "image/png" },
+      { url: "/app/devvo.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [{ url: "/apple-icon.png" }],
   },

@@ -13,6 +13,8 @@ interface Star {
   color: string;
   pulse: number;
   pulseSpeed: number;
+  trailLength: number;
+  twinklePhase: number;
 }
 
 interface Nebula {
@@ -21,6 +23,7 @@ interface Nebula {
   radius: number;
   color: string;
   opacity: number;
+  layer: number;
 }
 
 export default function StarfieldBackground() {
@@ -33,54 +36,50 @@ export default function StarfieldBackground() {
   const starsRef = useRef<Star[]>([]);
   const nebulaeRef = useRef<Nebula[]>([]);
 
-  // Calculate star count based on device
-  const starCount = isMobile ? 150 : 250;
-  const nebulaCount = isMobile ? 3 : 5;
+  const starCount = isMobile ? 200 : 350;
+  const nebulaCount = isMobile ? 4 : 7;
 
-  // Initialize stars and nebulae
   const initStarsAndNebulae = useCallback(
     (canvas: HTMLCanvasElement) => {
       const stars: Star[] = [];
       const nebulae: Nebula[] = [];
 
-      // Initialize stars with better distribution of sizes
+      // Initialize stars with enhanced properties
       for (let i = 0; i < starCount; i++) {
         const sizeRandom = Math.random();
-        // Create a more natural distribution of star sizes
-        // Most stars are small, few are large
-        let size;
-        if (sizeRandom < 0.7) {
-          size = 0.3 + Math.random() * 0.7; // 70% small stars
-        } else if (sizeRandom < 0.9) {
-          size = 1.0 + Math.random() * 0.8; // 20% medium stars
-        } else {
-          size = 1.8 + Math.random() * 1.0; // 10% large stars
-        }
+        let size =
+          sizeRandom < 0.65
+            ? 0.4 + Math.random() * 0.8
+            : sizeRandom < 0.85
+            ? 1.2 + Math.random() * 1.0
+            : 2.0 + Math.random() * 1.5;
 
         const colorVariation = Math.random();
         let color;
 
         if (theme === "dark") {
-          // More subtle colors in dark mode
-          if (colorVariation < 0.7) {
-            color = "255, 255, 255"; // White (most stars)
+          if (colorVariation < 0.6) {
+            color = "255, 255, 255"; // Pure white
+          } else if (colorVariation < 0.75) {
+            color = "200, 220, 255"; // Celestial blue
           } else if (colorVariation < 0.85) {
-            color = "200, 220, 255"; // Subtle blue-ish
+            color = "255, 200, 200"; // Cosmic red
           } else if (colorVariation < 0.95) {
-            color = "255, 220, 220"; // Subtle red-ish
+            color = "255, 230, 180"; // Stellar yellow
           } else {
-            color = "255, 240, 220"; // Subtle yellow-ish
+            color = "200, 255, 200"; // Nebula green
           }
         } else {
-          // More visible but still subtle colors in light mode
-          if (colorVariation < 0.7) {
-            color = "30, 30, 60"; // Dark blue (most stars)
+          if (colorVariation < 0.6) {
+            color = "20, 20, 50"; // Deep space blue
+          } else if (colorVariation < 0.75) {
+            color = "50, 20, 50"; // Cosmic purple
           } else if (colorVariation < 0.85) {
-            color = "60, 30, 60"; // Dark purple
+            color = "50, 30, 20"; // Stellar amber
           } else if (colorVariation < 0.95) {
-            color = "60, 40, 30"; // Dark amber
+            color = "20, 50, 50"; // Nebula teal
           } else {
-            color = "30, 60, 60"; // Dark teal
+            color = "50, 50, 20"; // Cosmic olive
           }
         }
 
@@ -88,34 +87,32 @@ export default function StarfieldBackground() {
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
           size,
-          speed: 0.02 + Math.random() * 0.1, // Slower speed
-          opacity: 0.1 + Math.random() * (theme === "dark" ? 0.9 : 0.6), // Lower opacity in light mode
+          speed: 0.03 + Math.random() * 0.15,
+          opacity: 0.2 + Math.random() * (theme === "dark" ? 0.8 : 0.5),
           color,
-          pulse: Math.random() * Math.PI * 2, // Random start phase
-          pulseSpeed: 0.01 + Math.random() * 0.02, // Slower pulse
+          pulse: Math.random() * Math.PI * 2,
+          pulseSpeed: 0.015 + Math.random() * 0.025,
+          trailLength: size > 1.5 ? 10 + Math.random() * 20 : 0,
+          twinklePhase: Math.random() * Math.PI * 2,
         });
       }
 
-      // Initialize nebulae (colorful cloud-like backgrounds)
+      // Initialize layered nebulae
       for (let i = 0; i < nebulaCount; i++) {
-        let color;
-        if (theme === "dark") {
-          const hue = Math.floor(Math.random() * 360);
-          color = `${hue}, 70%, 50%`;
-        } else {
-          const hue = Math.floor(Math.random() * 360);
-          color = `${hue}, 30%, 85%`;
-        }
+        const hue = Math.floor(Math.random() * 360);
+        const layer = Math.random();
+        const radius = 150 + Math.random() * 250;
 
         nebulae.push({
           x: Math.random() * canvas.width,
           y: Math.random() * canvas.height,
-          radius: 100 + Math.random() * 200,
-          color,
+          radius,
+          color: `${hue}, ${theme === "dark" ? "80%" : "40%"}, ${
+            theme === "dark" ? "60%" : "90%"
+          }`,
           opacity:
-            theme === "dark"
-              ? 0.02 + Math.random() * 0.03
-              : 0.01 + Math.random() * 0.02, // Very subtle, especially in light mode
+            theme === "dark" ? 0.03 + layer * 0.04 : 0.015 + layer * 0.02,
+          layer,
         });
       }
 
@@ -125,11 +122,9 @@ export default function StarfieldBackground() {
     [theme, starCount, nebulaCount]
   );
 
-  // Throttled mouse move handler
   const handleMouseMove = useCallback((e: MouseEvent) => {
     const now = Date.now();
-    // Only update mouse position every 50ms to improve performance
-    if (now - lastMouseMoveTime.current > 50) {
+    if (now - lastMouseMoveTime.current > 30) {
       setMousePosition({
         x: e.clientX,
         y: e.clientY,
@@ -145,7 +140,6 @@ export default function StarfieldBackground() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas dimensions and initialize
     const setCanvasDimensions = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -156,13 +150,12 @@ export default function StarfieldBackground() {
     window.addEventListener("resize", setCanvasDimensions);
     window.addEventListener("mousemove", handleMouseMove);
 
-    // Animation loop
     const animate = () => {
       if (!canvas || !ctx) return;
 
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Draw nebulae
+      // Draw layered nebulae
       nebulaeRef.current.forEach((nebula) => {
         const gradient = ctx.createRadialGradient(
           nebula.x,
@@ -173,89 +166,132 @@ export default function StarfieldBackground() {
           nebula.radius
         );
 
-        const colorFormat = "hsla";
         gradient.addColorStop(
           0,
-          `${colorFormat}(${nebula.color}, ${nebula.opacity * 2})`
+          `hsla(${nebula.color}, ${nebula.opacity * 2.5})`
         );
-        gradient.addColorStop(1, `${colorFormat}(${nebula.color}, 0)`);
+        gradient.addColorStop(
+          0.5,
+          `hsla(${nebula.color}, ${nebula.opacity * 1.5})`
+        );
+        gradient.addColorStop(1, `hsla(${nebula.color}, 0)`);
 
         ctx.fillStyle = gradient;
         ctx.beginPath();
         ctx.arc(nebula.x, nebula.y, nebula.radius, 0, Math.PI * 2);
         ctx.fill();
 
-        // Very slow movement for nebulae
-        nebula.x += Math.sin(Date.now() * 0.00005) * 0.1;
-        nebula.y += Math.cos(Date.now() * 0.00005) * 0.1;
+        // Gentle nebula drift
+        nebula.x += Math.sin(Date.now() * 0.00003 * nebula.layer) * 0.15;
+        nebula.y += Math.cos(Date.now() * 0.00003 * nebula.layer) * 0.15;
 
-        // Reset if off screen
         if (nebula.x > canvas.width + nebula.radius) nebula.x = -nebula.radius;
         if (nebula.x < -nebula.radius) nebula.x = canvas.width + nebula.radius;
         if (nebula.y > canvas.height + nebula.radius) nebula.y = -nebula.radius;
         if (nebula.y < -nebula.radius) nebula.y = canvas.height + nebula.radius;
       });
 
-      // Calculate mouse influence (very subtle parallax effect)
-      // Reduced from 0.0005 to 0.0001 for more subtle effect
-      const mouseInfluenceX = (mousePosition.x - canvas.width / 2) * 0.00008;
-      const mouseInfluenceY = (mousePosition.y - canvas.height / 2) * 0.00008;
+      // Calculate smooth mouse influence
+      const mouseInfluenceX = (mousePosition.x - canvas.width / 2) * 0.0001;
+      const mouseInfluenceY = (mousePosition.y - canvas.height / 2) * 0.0001;
+
+      // Draw constellation connections
+      if (!isMobile) {
+        ctx.strokeStyle = `rgba(255, 255, 255, 0.1)`;
+        ctx.lineWidth = 0.5;
+        starsRef.current.forEach((star1, i) => {
+          starsRef.current.slice(i + 1).forEach((star2) => {
+            const distance = Math.hypot(star1.x - star2.x, star1.y - star2.y);
+            if (distance < 100 && star1.size > 1 && star2.size > 1) {
+              ctx.beginPath();
+              ctx.moveTo(star1.x, star1.y);
+              ctx.lineTo(star2.x, star2.y);
+              ctx.stroke();
+            }
+          });
+        });
+      }
 
       // Draw and update stars
       starsRef.current.forEach((star) => {
-        // Update pulse with a more subtle effect
         star.pulse += star.pulseSpeed;
-        const pulseFactor = 0.1 * Math.sin(star.pulse) + 1; // Reduced from 0.2 to 0.1
+        star.twinklePhase += 0.05;
+        const pulseFactor = 0.15 * Math.sin(star.pulse) + 1;
+        const twinkleFactor = 0.5 * Math.sin(star.twinklePhase) + 1;
 
-        // Draw star with pulse effect
-        ctx.beginPath();
-        ctx.arc(star.x, star.y, star.size * pulseFactor, 0, Math.PI * 2);
+        // Draw star trail
+        if (star.trailLength > 0 && !isMobile) {
+          const trailGradient = ctx.createLinearGradient(
+            star.x,
+            star.y,
+            star.x - star.trailLength * star.speed,
+            star.y - star.trailLength * star.speed
+          );
+          trailGradient.addColorStop(
+            0,
+            `rgba(${star.color}, ${star.opacity * 0.3})`
+          );
+          trailGradient.addColorStop(1, `rgba(${star.color}, 0)`);
+          ctx.strokeStyle = trailGradient;
+          ctx.lineWidth = star.size * 0.5;
+          ctx.beginPath();
+          ctx.moveTo(star.x, star.y);
+          ctx.lineTo(
+            star.x - star.trailLength * star.speed,
+            star.y - star.trailLength * star.speed
+          );
+          ctx.stroke();
+        }
 
-        // Add glow effect only for larger stars to improve performance
-        if (star.size > 1.8 && !isMobile) {
+        // Draw star with glow
+        if (star.size > 1.5 && !isMobile) {
           const glow = ctx.createRadialGradient(
             star.x,
             star.y,
             0,
             star.x,
             star.y,
-            star.size * 3
+            star.size * 4
           );
-          glow.addColorStop(0, `rgba(${star.color}, ${star.opacity * 0.8})`);
+          glow.addColorStop(0, `rgba(${star.color}, ${star.opacity * 0.9})`);
           glow.addColorStop(1, `rgba(${star.color}, 0)`);
           ctx.fillStyle = glow;
           ctx.beginPath();
-          ctx.arc(star.x, star.y, star.size * 3, 0, Math.PI * 2);
+          ctx.arc(star.x, star.y, star.size * 4, 0, Math.PI * 2);
           ctx.fill();
         }
 
-        // Draw the star itself
-        ctx.fillStyle = `rgba(${star.color}, ${star.opacity * pulseFactor})`;
+        // Draw star
+        ctx.fillStyle = `rgba(${star.color}, ${
+          star.opacity * pulseFactor * twinkleFactor
+        })`;
         ctx.beginPath();
         ctx.arc(star.x, star.y, star.size * pulseFactor, 0, Math.PI * 2);
         ctx.fill();
 
-        // Move star with base speed + mouse influence
-        // Apply mouse influence based on star size for a parallax effect
-        // Larger stars move more than smaller ones
-        star.y += star.speed + mouseInfluenceY * star.size * 2;
-        star.x += mouseInfluenceX * star.size * 2;
+        // Update position with enhanced parallax
+        star.y += star.speed + mouseInfluenceY * star.size * 3;
+        star.x += mouseInfluenceX * star.size * 3;
 
-        // Reset star position if it goes off screen
+        // Reset position
         if (star.y > canvas.height) {
           star.y = 0;
           star.x = Math.random() * canvas.width;
+          star.twinklePhase = Math.random() * Math.PI * 2;
         } else if (star.y < 0) {
           star.y = canvas.height;
           star.x = Math.random() * canvas.width;
+          star.twinklePhase = Math.random() * Math.PI * 2;
         }
 
         if (star.x > canvas.width) {
           star.x = 0;
           star.y = Math.random() * canvas.height;
+          star.twinklePhase = Math.random() * Math.PI * 2;
         } else if (star.x < 0) {
           star.x = canvas.width;
           star.y = Math.random() * canvas.height;
+          star.twinklePhase = Math.random() * Math.PI * 2;
         }
       });
 
@@ -264,7 +300,6 @@ export default function StarfieldBackground() {
 
     animate();
 
-    // Clean up
     return () => {
       window.removeEventListener("resize", setCanvasDimensions);
       window.removeEventListener("mousemove", handleMouseMove);
@@ -276,7 +311,7 @@ export default function StarfieldBackground() {
     <canvas
       ref={canvasRef}
       className={`fixed inset-0 z-0 h-full w-full ${
-        theme === "light" ? "opacity-60" : "opacity-80"
+        theme === "light" ? "opacity-50" : "opacity-85"
       }`}
       aria-hidden="true"
     />

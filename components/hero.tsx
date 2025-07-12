@@ -61,8 +61,16 @@ export default function Hero() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5 }}
         >
-          A passionate web developer crafting beautiful, interactive, and
-          responsive websites with modern technologies.
+          I’m a passionate and detail-oriented web developer dedicated to
+          building beautiful, interactive, and fully responsive websites that
+          don’t just look great—but also perform seamlessly. With a strong grasp
+          of modern web technologies like HTML, CSS, JavaScript, React, and
+          Tailwind CSS, I bring digital ideas to life through clean code,
+          thoughtful design, and user-focused functionality. Whether it’s
+          creating smooth animations, optimizing performance, or making sure
+          every layout looks stunning on all devices, I’m driven by the
+          challenge of blending creativity with code to deliver immersive online
+          experiences. Let’s build something remarkable together.
         </motion.p>
 
         <motion.div

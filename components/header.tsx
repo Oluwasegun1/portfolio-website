@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, Moon, Sun, X } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import logo from "/app/devvo.png";
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
@@ -55,9 +56,15 @@ export default function Header() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            OluwaWebs Portfolio
-          </span>
+          {/* <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            <Image
+              src={logo}
+              alt="/SmallSquareLogoJpg.jpg"
+              height={80}
+              width={80}
+            />
+            Devvo Portfolio
+          </span> */}
         </motion.div>
 
         {/* Desktop Navigation */}
