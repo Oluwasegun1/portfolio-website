@@ -56,7 +56,7 @@ export default function Hero() {
         </h1>
 
         <motion.p
-          className="mb-8 text-xl text-muted-foreground"
+          className="mb-8 md:text-xl sm:text-sm  text-muted-foreground"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.5 }}

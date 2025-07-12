@@ -29,7 +29,7 @@ const projects: Project[] = [
     id: 1,
     title: "Gopaddi ",
     description:
-      "Built the frontend of GoPaddi, a travel ecosystem combining social features with booking services. Implemented responsive UIs for live streaming, trip planning, and marketplace interactions.",
+      "A comprehensive travel ecosystem that merges social networking with booking capabilities. Users can plan trips, book flights and hotels, explore a dynamic travel marketplace, and interact with travel content shared by other explorers. I built the responsive user interface for key modules including live streaming, trip planning dashboards, and business service listings.",
     image: "/gopaddi.png",
     technologies: [
       "React",
@@ -45,7 +45,7 @@ const projects: Project[] = [
     id: 2,
     title: "Apple iPhone 15 Pro website",
     description:
-      ", I recreated the Apple iPhone 15 Pro landing page, combining the smooth, high-performance animations of GSAP (GreenSock Animation Platform) with immersive Three.js 3D visual effects",
+      " A high-fidelity recreation of Apple’s iPhone 15 Pro landing page, showcasing cutting-edge frontend techniques. The page blends GSAP-powered animations with 3D interactions using Three.js to deliver a seamless, visually engaging product experience. I implemented every detail—from motion scroll effects to interactive camera transitions.",
     image: "/iphoneImage.png",
     technologies: ["React", "ThreeJs", "Tailwind CSS", "GSAP"],
     liveUrl: "https://iphone-15-lac-xi.vercel.app/",
@@ -55,7 +55,7 @@ const projects: Project[] = [
     id: 3,
     title: "DiscovaTrips ",
     description:
-      "Discovatrips is a travel discovery platform that helps users explore curated trips, view travel highlights, and connect with experiences shared by other travelers",
+      "A travel discovery platform designed to inspire wanderlust through curated experiences. Users can explore themed trips, view highlights shared by fellow travelers, and engage with destination-based content. I developed the frontend components that support trip browsing, highlight galleries, and interactive user profiles.",
     image: "/discova.png",
     technologies: [
       "React",
@@ -72,7 +72,7 @@ const projects: Project[] = [
     id: 4,
     title: "Restaurant Landing Page",
     description:
-      "An elegant and modern landing page crafted to highlight your restaurant's unique offerings, with sections for featured dishes, chef specials, operating hours, and contact information",
+      "A visually appealing and modern landing page tailored for restaurants. It features dynamic sections for featured dishes, chef specials, open hours, and reservations—designed to elevate brand identity and customer engagement. I focused on clean layout structure, intuitive navigation, and responsive design across devices",
     image:
       "/68747470733a2f2f692e6962622e636f2f356a78424b70772f696d6167652e706e67.png",
     technologies: ["React", "Next.js", "Tailwind CSS", "Redux"],
@@ -83,7 +83,7 @@ const projects: Project[] = [
     id: 5,
     title: "React Job Platform",
     description:
-      "A responsive portfolio website showcasing creative work with smooth animations and interactive elements.",
+      "A modern job board platform built exclusively for React developers. Users can browse curated job listings, post openings, and manage applications—all within a clean, developer-friendly interface. I implemented the full-stack solution, focusing on intuitive user flows, dynamic filtering, and form interactions that streamline the job search and hiring experience.",
     image: "/job.png",
     technologies: ["React", "Tailwind CSS"],
     liveUrl: "https://react-jobs-iota-flax.vercel.app/",
