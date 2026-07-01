@@ -1,26 +1,60 @@
+/** Root layout — wraps every page with providers, global header, and footer. */
 import type React from "react";
-
-import { Inter } from "next/font/google";
+import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
 import { Metadata } from "next";
 
-const inter: ReturnType<typeof Inter> = Inter({ subsets: ["latin"] });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+  display: "swap",
+});
 
 export const metadata: Metadata = {
-  title: "Devvo Portfolio",
-  description: "A showcase of my web development projects and skills",
+  title: "Oluwasegun — Frontend Developer",
+  description:
+    "Frontend Developer crafting beautiful, performant, and responsive web experiences with React, Next.js, and modern web technologies. Based in Lagos, Nigeria.",
+  keywords: [
+    "Frontend Developer",
+    "React Developer",
+    "Next.js",
+    "Oluwasegun",
+    "Lagos",
+    "Web Developer",
+    "UI Developer",
+  ],
+  authors: [{ name: "Ogunbanjo Oluwasegun" }],
+  creator: "Ogunbanjo Oluwasegun",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Oluwasegun — Frontend Developer",
+    description:
+      "Crafting beautiful, performant web experiences with React & Next.js.",
+    siteName: "Oluwasegun Portfolio",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Oluwasegun — Frontend Developer",
+    description:
+      "Crafting beautiful, performant web experiences with React & Next.js.",
+    creator: "@OgunbanjoSegun2",
+  },
   icons: {
     icon: [
-      { url: "/app/devvo.png", sizes: "16x16", type: "image/png" },
-      { url: "/app/devvo.png", sizes: "32x32", type: "image/png" },
-      { url: "/app/devvo.png", sizes: "96x96", type: "image/png" },
-      { url: "/app/devvo.png", sizes: "192x192", type: "image/png" },
-      { url: "/app/devvo.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+      { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
     ],
-    apple: [{ url: "/apple-icon.png" }],
+    apple: [{ url: "/apple-touch-icon.png" }],
   },
 };
 
@@ -30,15 +64,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html
+      lang="en"
+      suppressHydrationWarning={true}
+      className={`${inter.variable} ${spaceGrotesk.variable}`}
+    >
       <body className={inter.className}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="dark"
           enableSystem
-          disableTransitionOnChange
+          disableTransitionOnChange={false}
         >
-          <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors duration-300">
+          <div className="flex min-h-screen flex-col bg-background text-foreground transition-colors duration-500">
             <Header />
             {children}
             <Footer />

@@ -1,7 +1,8 @@
+/** Skills — categorized skill grid with SVG progress rings and an infinite marquee logo strip. */
 "use client";
 
+import { useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
 import {
   faReact,
@@ -12,191 +13,358 @@ import {
   faJs,
   faGitAlt,
   faNodeJs,
-  faNpm,
   faSass,
 } from "@fortawesome/free-brands-svg-icons";
 import Image from "next/image";
-import tailwindIcon from "@/public/icons8-tailwind-css-64.png";
-import reduxIcon from "@/public/icons8-redux-32.png";
-import gsapIcon from "@/public/gsap-greensock-logo-64.png";
-import nextIcon from "@/public/icons8-nextjs-96.png";
 
+// ─── Type definitions ───
 interface Skill {
   name: string;
   icon: React.ReactNode;
+  level: number;
+  category: "frontend" | "tools" | "design";
   color: string;
-  level: number; // 0-100
 }
 
-const skills: Skill[] = [
+// ─── Skill data ───
+const SKILLS: Skill[] = [
   {
     name: "React",
     icon: <FontAwesomeIcon icon={faReact} />,
-    color: "bg-blue-500",
     level: 90,
+    category: "frontend",
+    color: "#61DAFB",
   },
   {
     name: "Next.js",
-    icon: <Image src={nextIcon} alt="Tailwind CSS" width={40} height={40} />,
-    color: "bg-black dark:bg-white dark:text-black",
+    icon: (
+      <Image
+        src="/icons8-nextjs-96.png"
+        alt="Next.js"
+        width={32}
+        height={32}
+        className="invert"
+      />
+    ),
     level: 85,
-  },
-  {
-    name: "CSS",
-    icon: <FontAwesomeIcon icon={faCss3} />,
-    color: "bg-blue-400",
-    level: 95,
+    category: "frontend",
+    color: "#ffffff",
   },
   {
     name: "JavaScript",
     icon: <FontAwesomeIcon icon={faJs} />,
-    color: "bg-yellow-500",
     level: 95,
+    category: "frontend",
+    color: "#F7DF1E",
   },
   {
-    name: "HTML",
-    icon: <FontAwesomeIcon icon={faHtml5} />,
-    color: "bg-orange-500",
-    level: 98,
-  },
-  {
-    name: "Redux",
-    icon: <Image src={reduxIcon} alt="Tailwind CSS" width={40} height={40} />,
-    color: "bg-purple-200",
+    name: "TypeScript",
+    icon: (
+      <span className="font-display text-xs font-bold text-[#3178C6]">TS</span>
+    ),
     level: 80,
+    category: "frontend",
+    color: "#3178C6",
   },
   {
-    name: "GSAP",
-    icon: <Image src={gsapIcon} alt="Tailwind CSS" width={40} height={40} />,
-    color: "bg-green-500",
-    level: 75,
+    name: "HTML5",
+    icon: <FontAwesomeIcon icon={faHtml5} />,
+    level: 98,
+    category: "frontend",
+    color: "#E34F26",
+  },
+  {
+    name: "CSS3",
+    icon: <FontAwesomeIcon icon={faCss3} />,
+    level: 95,
+    category: "frontend",
+    color: "#264de4",
   },
   {
     name: "Tailwind CSS",
     icon: (
-      <Image src={tailwindIcon} alt="Tailwind CSS" width={40} height={40} />
+      <Image
+        src="/icons8-tailwind-css-64.png"
+        alt="Tailwind CSS"
+        width={32}
+        height={32}
+      />
     ),
-    color: "bg-cyan-500",
     level: 92,
+    category: "frontend",
+    color: "#06B6D4",
+  },
+  {
+    name: "GSAP",
+    icon: (
+      <Image
+        src="/gsap-greensock-logo-64.png"
+        alt="GSAP"
+        width={32}
+        height={32}
+      />
+    ),
+    level: 75,
+    category: "tools",
+    color: "#88CE02",
+  },
+  {
+    name: "Git",
+    icon: <FontAwesomeIcon icon={faGitAlt} />,
+    level: 85,
+    category: "tools",
+    color: "#F05032",
+  },
+  {
+    name: "Redux",
+    icon: (
+      <Image
+        src="/icons8-redux-32.png"
+        alt="Redux"
+        width={32}
+        height={32}
+      />
+    ),
+    level: 80,
+    category: "tools",
+    color: "#764ABC",
   },
   {
     name: "Figma",
     icon: <FontAwesomeIcon icon={faFigma} />,
-    color: "bg-pink-500",
     level: 88,
+    category: "design",
+    color: "#F24E1E",
   },
   {
     name: "Bootstrap",
     icon: <FontAwesomeIcon icon={faBootstrap} />,
-    color: "bg-purple-500",
     level: 85,
+    category: "design",
+    color: "#7952B3",
   },
 ];
 
-export default function Skills() {
-  const sectionRef = useRef(null);
-  const isInView = useInView(sectionRef, { once: false, amount: 0.2 });
+const CATEGORIES = [
+  { key: "all", label: "All Skills" },
+  { key: "frontend", label: "Frontend" },
+  { key: "tools", label: "Tools & Libs" },
+  { key: "design", label: "Design" },
+] as const;
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
+type CategoryKey = (typeof CATEGORIES)[number]["key"];
 
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 10,
-      },
-    },
-  };
+/** SVG circular progress ring */
+function ProgressRing({
+  level,
+  color,
+  isInView,
+  delay,
+}: {
+  level: number;
+  color: string;
+  isInView: boolean;
+  delay: number;
+}) {
+  const radius = 22;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (level / 100) * circumference;
 
   return (
-    <section id="skills" className="py-20" ref={sectionRef}>
-      <motion.div
-        className="mb-12 text-center"
-        initial={{ opacity: 0, y: 20 }}
-        animate={isInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-        transition={{ duration: 0.7 }}
-      >
-        <h2 className="mb-4 text-3xl font-bold md:text-4xl">
-          <span className="relative">
-            My Skills
-            <span className="absolute -bottom-2 left-0 h-1 w-full bg-gradient-to-r from-primary to-purple-400"></span>
-          </span>
-        </h2>
-        <p className="mx-auto max-w-2xl text-muted-foreground">
-          I've worked with a variety of technologies and frameworks to create
-          responsive and interactive web applications.
-        </p>
-      </motion.div>
+    <svg
+      width="56"
+      height="56"
+      viewBox="0 0 56 56"
+      className="absolute inset-0"
+      aria-hidden="true"
+    >
+      {/* Track */}
+      <circle
+        cx="28"
+        cy="28"
+        r={radius}
+        fill="none"
+        stroke="rgba(255,255,255,0.06)"
+        strokeWidth="3"
+      />
+      {/* Progress */}
+      <motion.circle
+        cx="28"
+        cy="28"
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        initial={{ strokeDashoffset: circumference }}
+        animate={
+          isInView
+            ? { strokeDashoffset }
+            : { strokeDashoffset: circumference }
+        }
+        transition={{ duration: 1.2, delay, ease: "easeOut" }}
+        transform="rotate(-90 28 28)"
+        style={{ filter: `drop-shadow(0 0 4px ${color}80)` }}
+      />
+    </svg>
+  );
+}
 
-      <motion.div
-        className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3"
-        variants={containerVariants}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-      >
-        {skills.map((skill, index) => (
-          <motion.div
-            key={skill.name}
-            variants={itemVariants}
-            whileHover={{
-              scale: 1.05,
-              boxShadow:
-                "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)",
-              transition: { duration: 0.3 },
-            }}
+/** Individual skill card with ring progress indicator */
+function SkillCard({
+  skill,
+  index,
+  isInView,
+}: {
+  skill: Skill;
+  index: number;
+  isInView: boolean;
+}) {
+  return (
+    <motion.div
+      className="glass-card group flex flex-col items-center gap-3 rounded-2xl p-5 text-center transition-all duration-300"
+      initial={{ opacity: 0, y: 30, scale: 0.95 }}
+      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
+      transition={{ duration: 0.5, delay: index * 0.07 }}
+      whileHover={{ y: -5, scale: 1.03 }}
+    >
+      {/* Icon with ring */}
+      <div className="relative flex h-14 w-14 items-center justify-center">
+        <ProgressRing
+          level={skill.level}
+          color={skill.color}
+          isInView={isInView}
+          delay={index * 0.07 + 0.3}
+        />
+        <div
+          className="z-10 flex h-9 w-9 items-center justify-center rounded-full text-lg transition-transform duration-300 group-hover:scale-110"
+          style={{ color: skill.color }}
+        >
+          {skill.icon}
+        </div>
+      </div>
+
+      {/* Name */}
+      <p className="text-sm font-semibold text-foreground/90 group-hover:text-white transition-colors duration-200">
+        {skill.name}
+      </p>
+
+      {/* Level */}
+      <p className="text-[11px] font-medium" style={{ color: skill.color }}>
+        {skill.level}%
+      </p>
+    </motion.div>
+  );
+}
+
+/** Infinite marquee strip of skill labels */
+function SkillsMarquee() {
+  const items = [...SKILLS, ...SKILLS]; // duplicate for seamless loop
+  return (
+    <div className="relative mt-12 overflow-hidden py-4">
+      {/* Fade masks */}
+      <div className="absolute inset-y-0 left-0 w-24 z-10 bg-gradient-to-r from-background to-transparent" />
+      <div className="absolute inset-y-0 right-0 w-24 z-10 bg-gradient-to-l from-background to-transparent" />
+
+      <div className="animate-marquee flex gap-4 whitespace-nowrap w-max">
+        {items.map((skill, index) => (
+          <span
+            key={`${skill.name}-${index}`}
+            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-4 py-2 text-sm font-medium text-muted-foreground"
           >
-            <div className="group relative overflow-hidden rounded-lg bg-card p-6 shadow-md transition-all duration-300 hover:shadow-lg dark:bg-gray-800/50">
-              {/* Background gradient that moves on hover */}
-              <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-purple-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
-
-              {/* Skill content */}
-              <div className="relative z-10 flex items-center gap-4">
-                <div
-                  className={`flex h-16 w-16 items-center justify-center rounded-full ${skill.color} text-2xl text-white shadow-lg transition-transform duration-300 group-hover:scale-110`}
-                >
-                  {skill.icon}
-                </div>
-
-                <div className="flex-1">
-                  <h3 className="mb-2 text-lg font-medium">{skill.name}</h3>
-
-                  {/* Skill progress bar */}
-                  <div className="h-2 w-full overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-                    <motion.div
-                      className="h-full rounded-full bg-gradient-to-r from-primary to-purple-500"
-                      initial={{ width: 0 }}
-                      animate={
-                        isInView ? { width: `${skill.level}%` } : { width: 0 }
-                      }
-                      transition={{ duration: 1, delay: index * 0.1 }}
-                    />
-                  </div>
-
-                  <div className="mt-1 text-right text-xs text-muted-foreground">
-                    {skill.level}%
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative elements */}
-              <div className="absolute -bottom-2 -right-2 h-12 w-12 rounded-full bg-primary/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-              <div className="absolute -top-2 -left-2 h-8 w-8 rounded-full bg-purple-500/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-            </div>
-          </motion.div>
+            <span
+              className="h-1.5 w-1.5 rounded-full"
+              style={{ backgroundColor: skill.color }}
+            />
+            {skill.name}
+          </span>
         ))}
-      </motion.div>
+      </div>
+    </div>
+  );
+}
+
+export default function Skills() {
+  const sectionRef = useRef(null);
+  const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
+
+  /** Active category filter */
+  const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
+
+  const filtered =
+    activeCategory === "all"
+      ? SKILLS
+      : SKILLS.filter((skill) => skill.category === activeCategory);
+
+  return (
+    <section id="skills" className="relative py-24 overflow-hidden" ref={sectionRef}>
+      {/* Background glow */}
+      <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-cyan-500/6 blur-[100px]" />
+
+      <div className="relative z-10">
+        {/* Section header */}
+        <motion.div
+          className="mb-12 text-center"
+          initial={{ opacity: 0, y: 20 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.6 }}
+        >
+          <p className="section-label mb-3">Expertise</p>
+          <h2 className="font-display text-4xl font-bold md:text-5xl">
+            My{" "}
+            <span className="gradient-text">Skills</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+            Technologies and tools I work with daily to build world-class
+            web experiences.
+          </p>
+        </motion.div>
+
+        {/* Category filter tabs */}
+        <motion.div
+          className="mb-10 flex flex-wrap justify-center gap-2"
+          initial={{ opacity: 0, y: 10 }}
+          animate={isInView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.key}
+              onClick={() => setActiveCategory(cat.key)}
+              className={`relative rounded-xl px-5 py-2 text-sm font-medium transition-all duration-200 ${
+                activeCategory === cat.key
+                  ? "text-white"
+                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
+              }`}
+            >
+              {activeCategory === cat.key && (
+                <motion.span
+                  layoutId="skill-tab"
+                  className="absolute inset-0 rounded-xl bg-violet-600/30 border border-violet-500/40"
+                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                />
+              )}
+              <span className="relative z-10">{cat.label}</span>
+            </button>
+          ))}
+        </motion.div>
+
+        {/* Skills grid */}
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+          {filtered.map((skill, index) => (
+            <SkillCard
+              key={skill.name}
+              skill={skill}
+              index={index}
+              isInView={isInView}
+            />
+          ))}
+        </div>
+
+        {/* Marquee strip */}
+        <SkillsMarquee />
+      </div>
     </section>
   );
 }
