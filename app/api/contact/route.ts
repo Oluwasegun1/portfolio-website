@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { z } from "zod";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 /** Mirrors the client-side schema — never trust validation that only ran in the browser */
 const contactSchema = z.object({
   name: z.string().trim().min(2).max(80),
@@ -31,9 +29,22 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: true });
     }
 
+    const apiKey = process.env.RESEND_API_KEY;
+    const contactEmail = process.env.CONTACT_EMAIL;
+
+    if (!apiKey || !contactEmail) {
+      console.error("Missing RESEND_API_KEY or CONTACT_EMAIL environment variables.");
+      return NextResponse.json(
+        { error: "Email service is not configured." },
+        { status: 503 }
+      );
+    }
+
+    const resend = new Resend(apiKey);
+
     await resend.emails.send({
       from: "Portfolio Contact <onboarding@resend.dev>", // Change this after verifying your domain
-      to: process.env.CONTACT_EMAIL!,
+      to: contactEmail,
       replyTo: email,
       subject: `New Portfolio Message from ${name}`,
       html: `
