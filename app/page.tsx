@@ -4,26 +4,26 @@ import About from "@/components/about";
 import Projects from "@/components/projects";
 import Skills from "@/components/skills";
 import Contact from "@/components/contact";
-import StarfieldBackground from "@/components/starfield-background";
+import AmbientBackground from "@/components/ambient-background";
 import CursorSpotlight from "@/components/cursor-spotlight";
+import CommandPalette from "@/components/command-palette";
 
 export default function Home() {
   return (
-    <main className="relative min-h-screen">
-      {/* Animated starfield canvas — fixed behind everything */}
-      <StarfieldBackground />
-
-      {/* Cursor torch spotlight */}
+    <>
+      <AmbientBackground />
       <CursorSpotlight />
+      <CommandPalette />
 
-      {/* Page content above the canvas */}
-      <div className="container relative z-10 mx-auto px-4">
-        <Hero />
-        <About />
-        <Projects />
-        <Skills />
-        <Contact />
-      </div>
-    </main>
+      <main id="main-content" className="relative z-10 min-h-screen">
+        <div className="container">
+          <Hero />
+          <About />
+          <Projects />
+          <Skills />
+          <Contact />
+        </div>
+      </main>
+    </>
   );
 }

@@ -1,13 +1,20 @@
-/** Header — sticky glassmorphism nav with OS monogram logo, active-section tracking, and animated mobile overlay. */
+/** Header — sticky glass nav with IntersectionObserver-based active-section tracking, an accessible Sheet-based mobile menu, and a command-palette launcher. */
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Menu, Moon, Sun, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetTitle,
+} from "@/components/ui/sheet";
+import { Menu, Moon, Sun, Search } from "lucide-react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
 
-/** Monogram logo — gradient "OS" in a glow ring */
+/** Monogram logo — gradient "OS" in a glow ring; the one recurring brand mark allowed to use the accent gradient */
 function Logo() {
   return (
     <a
@@ -16,12 +23,12 @@ function Logo() {
         evt.preventDefault();
         document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
       }}
-      className="relative flex items-center justify-center"
+      className="focus-ring relative flex h-10 w-10 items-center justify-center rounded-xl"
       aria-label="Home"
     >
       <div className="relative flex h-10 w-10 items-center justify-center rounded-xl gradient-border">
         <span
-          className="font-display text-sm font-bold gradient-text select-none"
+          className="font-display gradient-text select-none text-sm font-bold"
           aria-hidden="true"
         >
           OS
@@ -32,243 +39,173 @@ function Logo() {
 }
 
 const NAV_ITEMS = [
-  { name: "Home", href: "#home" },
-  { name: "About", href: "#about" },
-  { name: "Projects", href: "#projects" },
-  { name: "Skills", href: "#skills" },
-  { name: "Contact", href: "#contact" },
+  { name: "Home", href: "home" },
+  { name: "About", href: "about" },
+  { name: "Projects", href: "projects" },
+  { name: "Skills", href: "skills" },
+  { name: "Contact", href: "contact" },
 ];
 
 export default function Header() {
   const { theme, setTheme } = useTheme();
 
-  /** Tracks whether page has scrolled past 50px */
   const [scrolled, setScrolled] = useState(false);
-
-  /** Currently active section ID based on scroll position */
   const [activeSection, setActiveSection] = useState("home");
-
-  /** Mobile drawer open/closed */
   const [mobileOpen, setMobileOpen] = useState(false);
+  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  const toggleTheme = () =>
-    setTheme(theme === "dark" ? "light" : "dark");
+  const toggleTheme = () => setTheme(theme === "dark" ? "light" : "dark");
 
-  // Handle scroll shadow + active section tracking
   useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50);
-
-      // Determine active section by visible viewport position
-      const sectionIds = NAV_ITEMS.map((item) => item.href.slice(1));
-      let current = "home";
-
-      for (const id of sectionIds) {
-        const el = document.getElementById(id);
-        if (!el) continue;
-        if (el.getBoundingClientRect().top <= 100) {
-          current = id;
-        }
-      }
-      setActiveSection(current);
-    };
-
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Prevent body scroll when mobile menu is open
+  // Track which section is centered in the viewport, without polling on every scroll frame
   useEffect(() => {
-    if (mobileOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen]);
+    const sections = NAV_ITEMS.map((item) => document.getElementById(item.href)).filter(
+      (el): el is HTMLElement => el !== null
+    );
 
-  const scrollTo = (href: string) => {
-    const id = href.slice(1);
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter((entry) => entry.isIntersecting);
+        if (visible.length > 0) {
+          setActiveSection(visible[0].target.id);
+        }
+      },
+      { rootMargin: "-45% 0px -45% 0px", threshold: 0 }
+    );
+
+    sections.forEach((section) => observerRef.current?.observe(section));
+    return () => observerRef.current?.disconnect();
+  }, []);
+
+  const scrollTo = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
     setMobileOpen(false);
   };
 
-  return (
-    <>
-      <header
-        className={`sticky top-0 z-50 w-full transition-all duration-500 ${
-          scrolled
-            ? "glass shadow-lg shadow-black/20 border-b border-white/[0.06]"
-            : "bg-transparent"
-        }`}
-      >
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <Logo />
-          </motion.div>
+  const openCommandPalette = () => {
+    window.dispatchEvent(new Event("open-command-palette"));
+  };
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:block" aria-label="Main navigation">
-            <motion.ul
-              className="flex items-center space-x-1"
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.1 }}
-            >
-              {NAV_ITEMS.map((item, index) => {
-                const isActive = activeSection === item.href.slice(1);
-                return (
-                  <motion.li
-                    key={item.name}
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: index * 0.07 }}
+  return (
+    <header
+      className={cn(
+        "sticky top-0 z-50 w-full transition-all duration-300",
+        scrolled ? "glass border-b border-border shadow-lg shadow-black/10" : "bg-transparent"
+      )}
+    >
+      <div className="container flex h-16 items-center justify-between">
+        <Logo />
+
+        {/* Desktop nav */}
+        <nav className="hidden md:block" aria-label="Main navigation">
+          <ul className="flex items-center gap-1">
+            {NAV_ITEMS.map((item) => {
+              const isActive = activeSection === item.href;
+              return (
+                <li key={item.name}>
+                  <a
+                    href={`#${item.href}`}
+                    onClick={(evt) => {
+                      evt.preventDefault();
+                      scrollTo(item.href);
+                    }}
+                    aria-current={isActive ? "true" : undefined}
+                    className={cn(
+                      "focus-ring relative inline-block rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200",
+                      isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    )}
                   >
+                    {isActive && (
+                      <motion.span
+                        layoutId="nav-active"
+                        className="absolute inset-0 rounded-lg border border-border bg-accent"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{item.name}</span>
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          {/* Command palette trigger */}
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            className="focus-ring hidden items-center gap-2 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground sm:flex"
+            aria-label="Open command palette"
+          >
+            <Search className="h-3.5 w-3.5" />
+            <span className="font-mono">⌘K</span>
+          </button>
+          <button
+            type="button"
+            onClick={openCommandPalette}
+            className="focus-ring flex h-9 w-9 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-accent hover:text-foreground sm:hidden"
+            aria-label="Open command palette"
+          >
+            <Search className="h-4 w-4" />
+          </button>
+
+          {/* Theme toggle */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleTheme}
+            aria-label="Toggle theme"
+            className="focus-ring relative h-9 w-9 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+          </Button>
+
+          {/* Mobile menu */}
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="focus-ring h-9 w-9 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground md:hidden"
+              aria-label="Open menu"
+              onClick={() => setMobileOpen(true)}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+            <SheetContent side="right" className="w-full border-l border-border bg-background/98 backdrop-blur-xl sm:max-w-sm">
+              <SheetTitle className="font-display text-lg">Navigate</SheetTitle>
+              <nav className="mt-8 flex flex-col gap-2" aria-label="Mobile navigation">
+                {NAV_ITEMS.map((item) => (
+                  <SheetClose asChild key={item.name}>
                     <a
-                      href={item.href}
+                      href={`#${item.href}`}
                       onClick={(evt) => {
                         evt.preventDefault();
                         scrollTo(item.href);
                       }}
-                      className={`relative px-3 py-2 text-sm font-medium transition-colors duration-200 rounded-lg group inline-block ${
-                        isActive
-                          ? "text-white"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {/* Active indicator pill */}
-                      {isActive && (
-                        <motion.span
-                          layoutId="nav-active"
-                          className="absolute inset-0 rounded-lg bg-white/[0.07] border border-white/[0.1]"
-                          transition={{
-                            type: "spring",
-                            stiffness: 380,
-                            damping: 30,
-                          }}
-                        />
+                      className={cn(
+                        "focus-ring rounded-xl px-4 py-3 font-display text-xl font-medium transition-colors",
+                        activeSection === item.href
+                          ? "bg-accent text-foreground"
+                          : "text-muted-foreground hover:bg-accent hover:text-foreground"
                       )}
-                      <span className="relative z-10">{item.name}</span>
+                    >
+                      {item.name}
                     </a>
-                  </motion.li>
-                );
-              })}
-            </motion.ul>
-          </nav>
-
-          {/* Right actions */}
-          <div className="flex items-center gap-2">
-            {/* Theme toggle */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                className="relative h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.07] transition-all duration-200"
-              >
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-              </Button>
-            </motion.div>
-
-            {/* Mobile menu button */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.25 }}
-              className="md:hidden"
-            >
-              <Button
-                variant="ghost"
-                size="icon"
-                className="relative h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-white/[0.07] transition-all duration-200"
-                onClick={() => setMobileOpen(!mobileOpen)}
-                aria-label="Toggle menu"
-                aria-expanded={mobileOpen}
-              >
-                <AnimatePresence mode="wait" initial={false}>
-                  {mobileOpen ? (
-                    <motion.div
-                      key="close"
-                      initial={{ rotate: -90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: 90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <X className="h-5 w-5" />
-                    </motion.div>
-                  ) : (
-                    <motion.div
-                      key="menu"
-                      initial={{ rotate: 90, opacity: 0 }}
-                      animate={{ rotate: 0, opacity: 1 }}
-                      exit={{ rotate: -90, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <Menu className="h-5 w-5" />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </Button>
-            </motion.div>
-          </div>
+                  </SheetClose>
+                ))}
+              </nav>
+            </SheetContent>
+          </Sheet>
         </div>
-      </header>
-
-      {/* Mobile full-screen overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <motion.div
-            className="fixed inset-0 z-40 flex flex-col md:hidden"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {/* Blurred backdrop */}
-            <div
-              className="absolute inset-0 bg-background/95 backdrop-blur-xl"
-              onClick={() => setMobileOpen(false)}
-            />
-
-            {/* Nav items */}
-            <nav
-              className="relative z-10 flex flex-1 flex-col items-center justify-center gap-6"
-              aria-label="Mobile navigation"
-            >
-              {NAV_ITEMS.map((item, index) => (
-                <motion.a
-                  key={item.name}
-                  href={item.href}
-                  onClick={(evt) => {
-                    evt.preventDefault();
-                    scrollTo(item.href);
-                  }}
-                  className="font-display text-4xl font-bold text-foreground/80 hover:text-foreground transition-colors duration-200"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 30 }}
-                  transition={{ duration: 0.3, delay: index * 0.07 }}
-                >
-                  {item.name}
-                </motion.a>
-              ))}
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </>
+      </div>
+    </header>
   );
 }

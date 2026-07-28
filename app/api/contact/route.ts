@@ -1,27 +1,34 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
+import { z } from "zod";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+/** Mirrors the client-side schema — never trust validation that only ran in the browser */
+const contactSchema = z.object({
+  name: z.string().trim().min(2).max(80),
+  email: z.string().trim().email(),
+  message: z.string().trim().min(10).max(500),
+  company: z.string().max(0).optional(),
+});
+
 export async function POST(req: Request) {
   try {
-    const { name, email, message } = await req.json();
+    const body = await req.json();
+    const parsed = contactSchema.safeParse(body);
 
-    // Basic validation
-    if (!name || !email || !message) {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "All fields are required." },
+        { error: parsed.error.issues[0]?.message || "Invalid submission." },
         { status: 400 }
       );
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const { name, email, message, company } = parsed.data;
 
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email address." },
-        { status: 400 }
-      );
+    // Honeypot tripped — pretend success so the bot doesn't learn to avoid the field, but never send an email
+    if (company) {
+      return NextResponse.json({ success: true });
     }
 
     await resend.emails.send({
@@ -31,31 +38,16 @@ export async function POST(req: Request) {
       subject: `New Portfolio Message from ${name}`,
       html: `
         <h2>New Contact Form Submission</h2>
-
         <p><strong>Name:</strong> ${name}</p>
-
         <p><strong>Email:</strong> ${email}</p>
-
         <p><strong>Message:</strong></p>
-
         <p>${message.replace(/\n/g, "<br/>")}</p>
       `,
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Email sent successfully.",
-    });
+    return NextResponse.json({ success: true, message: "Email sent successfully." });
   } catch (error) {
     console.error(error);
-
-    return NextResponse.json(
-      {
-        error: "Failed to send email.",
-      },
-      {
-        status: 500,
-      }
-    );
+    return NextResponse.json({ error: "Failed to send email." }, { status: 500 });
   }
 }

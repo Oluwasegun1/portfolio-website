@@ -1,14 +1,22 @@
-/** CursorSpotlight — radial torch effect that follows the cursor in dark mode. */
+/** CursorSpotlight — a very subtle radial glow that follows the pointer in dark mode. Disabled for touch devices (no persistent pointer) and for users who prefer reduced motion. */
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 
 export default function CursorSpotlight() {
   const spotlightRef = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
+  // Lazy initializer runs once on mount (client-only component), avoiding a setState-in-effect render cascade
+  const [enabled] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    return finePointer && !reducedMotion;
+  });
 
   useEffect(() => {
+    if (!enabled) return;
     const spotlight = spotlightRef.current;
     if (!spotlight) return;
 
@@ -19,18 +27,17 @@ export default function CursorSpotlight() {
 
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, []);
+  }, [enabled]);
 
-  // Only show in dark mode
-  if (resolvedTheme !== "dark") return null;
+  if (!enabled || resolvedTheme !== "dark") return null;
 
   return (
     <div
       ref={spotlightRef}
-      className="pointer-events-none fixed inset-0 z-30 transition-opacity duration-300"
+      className="pointer-events-none fixed inset-0 z-30"
       style={{
         background:
-          "radial-gradient(600px circle at var(--x, 50%) var(--y, 50%), rgba(124, 58, 237, 0.06), transparent 70%)",
+          "radial-gradient(560px circle at var(--x, 50%) var(--y, 50%), hsl(var(--primary) / 0.04), transparent 70%)",
       }}
       aria-hidden="true"
     />

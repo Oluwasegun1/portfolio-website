@@ -1,282 +1,95 @@
-/** Skills — categorized skill grid with SVG progress rings and an infinite marquee logo strip. */
+/** Skills — grouped capability tags plus an ambient logo marquee. Deliberately drops self-rated percentage scores, which read as unverifiable filler rather than credible signal. */
 "use client";
 
-import { useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRef, type ReactNode } from "react";
 import { motion, useInView } from "framer-motion";
 import {
-  faReact,
-  faCss3,
-  faHtml5,
-  faBootstrap,
-  faFigma,
-  faJs,
-  faGitAlt,
-  faNodeJs,
-  faSass,
-} from "@fortawesome/free-brands-svg-icons";
-import Image from "next/image";
+  FaReact,
+  FaHtml5,
+  FaCss3,
+  FaBootstrap,
+  FaFigma,
+  FaGitAlt,
+} from "react-icons/fa";
+import { SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss, SiGreensock, SiRedux } from "react-icons/si";
 
-// ─── Type definitions ───
 interface Skill {
   name: string;
-  icon: React.ReactNode;
-  level: number;
-  category: "frontend" | "tools" | "design";
-  color: string;
+  icon: ReactNode;
 }
 
-// ─── Skill data ───
-const SKILLS: Skill[] = [
+interface SkillGroup {
+  title: string;
+  skills: Skill[];
+}
+
+const GROUPS: SkillGroup[] = [
   {
-    name: "React",
-    icon: <FontAwesomeIcon icon={faReact} />,
-    level: 90,
-    category: "frontend",
-    color: "#61DAFB",
+    title: "Languages & Frameworks",
+    skills: [
+      { name: "React", icon: <FaReact /> },
+      { name: "Next.js", icon: <SiNextdotjs /> },
+      { name: "TypeScript", icon: <SiTypescript /> },
+      { name: "JavaScript", icon: <SiJavascript /> },
+      { name: "HTML5", icon: <FaHtml5 /> },
+      { name: "CSS3", icon: <FaCss3 /> },
+    ],
   },
   {
-    name: "Next.js",
-    icon: (
-      <Image
-        src="/icons8-nextjs-96.png"
-        alt="Next.js"
-        width={32}
-        height={32}
-        className="invert"
-      />
-    ),
-    level: 85,
-    category: "frontend",
-    color: "#ffffff",
+    title: "Styling & Motion",
+    skills: [
+      { name: "Tailwind CSS", icon: <SiTailwindcss /> },
+      { name: "Framer Motion", icon: <span className="text-[10px] font-bold">FM</span> },
+      { name: "GSAP", icon: <SiGreensock /> },
+      { name: "Bootstrap", icon: <FaBootstrap /> },
+    ],
   },
   {
-    name: "JavaScript",
-    icon: <FontAwesomeIcon icon={faJs} />,
-    level: 95,
-    category: "frontend",
-    color: "#F7DF1E",
-  },
-  {
-    name: "TypeScript",
-    icon: (
-      <span className="font-display text-xs font-bold text-[#3178C6]">TS</span>
-    ),
-    level: 80,
-    category: "frontend",
-    color: "#3178C6",
-  },
-  {
-    name: "HTML5",
-    icon: <FontAwesomeIcon icon={faHtml5} />,
-    level: 98,
-    category: "frontend",
-    color: "#E34F26",
-  },
-  {
-    name: "CSS3",
-    icon: <FontAwesomeIcon icon={faCss3} />,
-    level: 95,
-    category: "frontend",
-    color: "#264de4",
-  },
-  {
-    name: "Tailwind CSS",
-    icon: (
-      <Image
-        src="/icons8-tailwind-css-64.png"
-        alt="Tailwind CSS"
-        width={32}
-        height={32}
-      />
-    ),
-    level: 92,
-    category: "frontend",
-    color: "#06B6D4",
-  },
-  {
-    name: "GSAP",
-    icon: (
-      <Image
-        src="/gsap-greensock-logo-64.png"
-        alt="GSAP"
-        width={32}
-        height={32}
-      />
-    ),
-    level: 75,
-    category: "tools",
-    color: "#88CE02",
-  },
-  {
-    name: "Git",
-    icon: <FontAwesomeIcon icon={faGitAlt} />,
-    level: 85,
-    category: "tools",
-    color: "#F05032",
-  },
-  {
-    name: "Redux",
-    icon: (
-      <Image
-        src="/icons8-redux-32.png"
-        alt="Redux"
-        width={32}
-        height={32}
-      />
-    ),
-    level: 80,
-    category: "tools",
-    color: "#764ABC",
-  },
-  {
-    name: "Figma",
-    icon: <FontAwesomeIcon icon={faFigma} />,
-    level: 88,
-    category: "design",
-    color: "#F24E1E",
-  },
-  {
-    name: "Bootstrap",
-    icon: <FontAwesomeIcon icon={faBootstrap} />,
-    level: 85,
-    category: "design",
-    color: "#7952B3",
+    title: "Tools & Workflow",
+    skills: [
+      { name: "Git", icon: <FaGitAlt /> },
+      { name: "Redux", icon: <SiRedux /> },
+      { name: "Figma", icon: <FaFigma /> },
+      { name: "REST APIs", icon: <span className="text-[10px] font-bold">{"{ }"}</span> },
+    ],
   },
 ];
 
-const CATEGORIES = [
-  { key: "all", label: "All Skills" },
-  { key: "frontend", label: "Frontend" },
-  { key: "tools", label: "Tools & Libs" },
-  { key: "design", label: "Design" },
-] as const;
+const MARQUEE_ITEMS = GROUPS.flatMap((group) => group.skills);
 
-type CategoryKey = (typeof CATEGORIES)[number]["key"];
-
-/** SVG circular progress ring */
-function ProgressRing({
-  level,
-  color,
-  isInView,
-  delay,
-}: {
-  level: number;
-  color: string;
-  isInView: boolean;
-  delay: number;
-}) {
-  const radius = 22;
-  const circumference = 2 * Math.PI * radius;
-  const strokeDashoffset = circumference - (level / 100) * circumference;
-
-  return (
-    <svg
-      width="56"
-      height="56"
-      viewBox="0 0 56 56"
-      className="absolute inset-0"
-      aria-hidden="true"
-    >
-      {/* Track */}
-      <circle
-        cx="28"
-        cy="28"
-        r={radius}
-        fill="none"
-        stroke="rgba(255,255,255,0.06)"
-        strokeWidth="3"
-      />
-      {/* Progress */}
-      <motion.circle
-        cx="28"
-        cy="28"
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        initial={{ strokeDashoffset: circumference }}
-        animate={
-          isInView
-            ? { strokeDashoffset }
-            : { strokeDashoffset: circumference }
-        }
-        transition={{ duration: 1.2, delay, ease: "easeOut" }}
-        transform="rotate(-90 28 28)"
-        style={{ filter: `drop-shadow(0 0 4px ${color}80)` }}
-      />
-    </svg>
-  );
-}
-
-/** Individual skill card with ring progress indicator */
-function SkillCard({
-  skill,
-  index,
-  isInView,
-}: {
-  skill: Skill;
-  index: number;
-  isInView: boolean;
-}) {
+function SkillTag({ skill, delay, isInView }: { skill: Skill; delay: number; isInView: boolean }) {
   return (
     <motion.div
-      className="glass-card group flex flex-col items-center gap-3 rounded-2xl p-5 text-center transition-all duration-300"
-      initial={{ opacity: 0, y: 30, scale: 0.95 }}
-      animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.07 }}
-      whileHover={{ y: -5, scale: 1.03 }}
+      className="flex items-center gap-2.5 rounded-xl border border-border bg-accent/30 px-3.5 py-2.5 transition-colors hover:border-primary/40 hover:bg-accent"
+      initial={{ opacity: 0, y: 10 }}
+      animate={isInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.4, delay }}
     >
-      {/* Icon with ring */}
-      <div className="relative flex h-14 w-14 items-center justify-center">
-        <ProgressRing
-          level={skill.level}
-          color={skill.color}
-          isInView={isInView}
-          delay={index * 0.07 + 0.3}
-        />
-        <div
-          className="z-10 flex h-9 w-9 items-center justify-center rounded-full text-lg transition-transform duration-300 group-hover:scale-110"
-          style={{ color: skill.color }}
-        >
-          {skill.icon}
-        </div>
-      </div>
-
-      {/* Name */}
-      <p className="text-sm font-semibold text-foreground/90 group-hover:text-white transition-colors duration-200">
-        {skill.name}
-      </p>
-
-      {/* Level */}
-      <p className="text-[11px] font-medium" style={{ color: skill.color }}>
-        {skill.level}%
-      </p>
+      <span className="flex h-5 w-5 shrink-0 items-center justify-center text-primary [&_svg]:h-4 [&_svg]:w-4">
+        {skill.icon}
+      </span>
+      <span className="text-sm font-medium text-foreground">{skill.name}</span>
     </motion.div>
   );
 }
 
-/** Infinite marquee strip of skill labels */
+/** Infinite marquee strip of skill logos — pauses on hover and collapses under prefers-reduced-motion (globals.css) */
 function SkillsMarquee() {
-  const items = [...SKILLS, ...SKILLS]; // duplicate for seamless loop
+  const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
   return (
-    <div className="relative mt-12 overflow-hidden py-4">
-      {/* Fade masks */}
-      <div className="absolute inset-y-0 left-0 w-24 z-10 bg-gradient-to-r from-background to-transparent" />
-      <div className="absolute inset-y-0 right-0 w-24 z-10 bg-gradient-to-l from-background to-transparent" />
+    <div className="relative mt-14 overflow-hidden py-4">
+      <div className="absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-background to-transparent" />
+      <div className="absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-background to-transparent" />
 
-      <div className="animate-marquee flex gap-4 whitespace-nowrap w-max">
+      <div className="animate-marquee flex w-max gap-4 whitespace-nowrap hover:[animation-play-state:paused]">
         {items.map((skill, index) => (
           <span
             key={`${skill.name}-${index}`}
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/4 px-4 py-2 text-sm font-medium text-muted-foreground"
+            className="inline-flex items-center gap-2 rounded-full border border-border bg-accent/30 px-4 py-2 text-sm font-medium text-muted-foreground"
           >
-            <span
-              className="h-1.5 w-1.5 rounded-full"
-              style={{ backgroundColor: skill.color }}
-            />
+            <span className="flex h-4 w-4 items-center justify-center text-primary [&_svg]:h-3.5 [&_svg]:w-3.5">
+              {skill.icon}
+            </span>
             {skill.name}
           </span>
         ))}
@@ -289,82 +102,45 @@ export default function Skills() {
   const sectionRef = useRef(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.15 });
 
-  /** Active category filter */
-  const [activeCategory, setActiveCategory] = useState<CategoryKey>("all");
-
-  const filtered =
-    activeCategory === "all"
-      ? SKILLS
-      : SKILLS.filter((skill) => skill.category === activeCategory);
-
   return (
-    <section id="skills" className="relative py-24 overflow-hidden" ref={sectionRef}>
-      {/* Background glow */}
-      <div className="pointer-events-none absolute bottom-0 right-0 h-[400px] w-[400px] rounded-full bg-cyan-500/6 blur-[100px]" />
+    <section id="skills" className="relative py-24" ref={sectionRef}>
+      <motion.div
+        className="mb-14 text-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5 }}
+      >
+        <p className="section-label mb-3">Expertise</p>
+        <h2 className="font-display text-4xl font-bold md:text-5xl">
+          My <span className="text-primary">Skills</span>
+        </h2>
+        <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
+          The languages, frameworks, and tools I reach for daily to build
+          production-quality interfaces.
+        </p>
+      </motion.div>
 
-      <div className="relative z-10">
-        {/* Section header */}
-        <motion.div
-          className="mb-12 text-center"
-          initial={{ opacity: 0, y: 20 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.6 }}
-        >
-          <p className="section-label mb-3">Expertise</p>
-          <h2 className="font-display text-4xl font-bold md:text-5xl">
-            My{" "}
-            <span className="gradient-text">Skills</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-            Technologies and tools I work with daily to build world-class
-            web experiences.
-          </p>
-        </motion.div>
-
-        {/* Category filter tabs */}
-        <motion.div
-          className="mb-10 flex flex-wrap justify-center gap-2"
-          initial={{ opacity: 0, y: 10 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.2 }}
-        >
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setActiveCategory(cat.key)}
-              className={`relative rounded-xl px-5 py-2 text-sm font-medium transition-all duration-200 ${
-                activeCategory === cat.key
-                  ? "text-white"
-                  : "text-muted-foreground hover:text-foreground hover:bg-white/5"
-              }`}
-            >
-              {activeCategory === cat.key && (
-                <motion.span
-                  layoutId="skill-tab"
-                  className="absolute inset-0 rounded-xl bg-violet-600/30 border border-violet-500/40"
-                  transition={{ type: "spring", stiffness: 380, damping: 30 }}
+      <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-3">
+        {GROUPS.map((group, groupIndex) => (
+          <div key={group.title} className="rounded-2xl border border-border p-6">
+            <h3 className="font-mono mb-4 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+              {group.title}
+            </h3>
+            <div className="flex flex-col gap-2.5">
+              {group.skills.map((skill, skillIndex) => (
+                <SkillTag
+                  key={skill.name}
+                  skill={skill}
+                  isInView={isInView}
+                  delay={groupIndex * 0.1 + skillIndex * 0.05}
                 />
-              )}
-              <span className="relative z-10">{cat.label}</span>
-            </button>
-          ))}
-        </motion.div>
-
-        {/* Skills grid */}
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
-          {filtered.map((skill, index) => (
-            <SkillCard
-              key={skill.name}
-              skill={skill}
-              index={index}
-              isInView={isInView}
-            />
-          ))}
-        </div>
-
-        {/* Marquee strip */}
-        <SkillsMarquee />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
+
+      <SkillsMarquee />
     </section>
   );
 }

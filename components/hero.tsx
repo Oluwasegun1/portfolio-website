@@ -1,18 +1,14 @@
-/** Hero — full-viewport landing with typewriter role cycling, availability badge, and magnetic CTAs. */
+/** Hero — asymmetric landing section: intro/CTAs on the left, a terminal-style identity card on the right. */
 "use client";
 
 import type React from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowDown, Github, Linkedin, Twitter, Download, ArrowRight } from "lucide-react";
+import { ArrowDown, Github, Linkedin, Twitter, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 /** Roles cycled through by the typewriter */
-const ROLES = [
-  "Frontend Developer",
-  "React Specialist",
-  "UI/UX Enthusiast",
-  "Digital Craftsman",
-];
+const ROLES = ["Frontend Developer", "React Specialist", "UI Engineer", "Digital Craftsman"];
 
 /** Typewriter — types and deletes a list of strings in a loop */
 function Typewriter({ words }: { words: string[] }) {
@@ -22,14 +18,14 @@ function Typewriter({ words }: { words: string[] }) {
 
   useEffect(() => {
     const current = words[wordIndex % words.length];
-    const delay = isDeleting ? 55 : 110;
+    const delay = isDeleting ? 45 : 90;
 
     const timeout = setTimeout(() => {
       setDisplayText((prev) => {
         if (!isDeleting) {
           const next = current.slice(0, prev.length + 1);
           if (next === current) {
-            setTimeout(() => setIsDeleting(true), 1800);
+            setTimeout(() => setIsDeleting(true), 1900);
           }
           return next;
         } else {
@@ -49,35 +45,12 @@ function Typewriter({ words }: { words: string[] }) {
   return (
     <span className="gradient-text font-display">
       {displayText}
-      <span className="animate-cursor-blink ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[1px] rounded-sm bg-violet-400 align-middle" />
+      <span className="animate-cursor-blink ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[1px] rounded-sm bg-primary align-middle" />
     </span>
   );
 }
 
-/** Animated letter-by-letter name reveal */
-function AnimatedName({ name }: { name: string }) {
-  return (
-    <span aria-label={name} className="inline-block">
-      {name.split("").map((letter, index) => (
-        <motion.span
-          key={index}
-          className="inline-block"
-          initial={{ opacity: 0, y: 40, rotateX: -90 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{
-            duration: 0.6,
-            delay: 0.4 + index * 0.07,
-            ease: [0.23, 1, 0.32, 1],
-          }}
-        >
-          {letter === " " ? "\u00A0" : letter}
-        </motion.span>
-      ))}
-    </span>
-  );
-}
-
-/** Social link with hover glow */
+/** Social link with a consistent focus/hover treatment */
 function SocialLink({
   href,
   icon: Icon,
@@ -93,12 +66,55 @@ function SocialLink({
       target="_blank"
       rel="noopener noreferrer"
       aria-label={label}
-      className="flex h-10 w-10 items-center justify-center rounded-xl glass border border-white/10 text-muted-foreground transition-all duration-300 hover:text-white hover:border-violet-500/50 hover:glow-primary"
-      whileHover={{ scale: 1.1, y: -2 }}
+      className="focus-ring flex h-10 w-10 items-center justify-center rounded-xl border border-border text-muted-foreground transition-colors duration-200 hover:border-primary/50 hover:bg-accent hover:text-foreground"
+      whileHover={{ y: -2 }}
       whileTap={{ scale: 0.95 }}
     >
       <Icon className="h-4 w-4" />
     </motion.a>
+  );
+}
+
+/** Identity snippet — a terminal-styled card standing in for a traditional headshot/illustration */
+function IdentityCard() {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: 0.5 }}
+      className="animate-float-slow w-full max-w-sm rounded-2xl border border-border bg-card/70 p-6 font-mono text-[13px] shadow-2xl shadow-black/20 backdrop-blur-xl"
+    >
+      <div className="mb-4 flex items-center gap-3 border-b border-border pb-3">
+        <div className="flex gap-1.5">
+          <span className="h-2.5 w-2.5 rounded-full bg-destructive/60" />
+          <span className="h-2.5 w-2.5 rounded-full bg-amber-400/60" />
+          <span className="h-2.5 w-2.5 rounded-full bg-success/60" />
+        </div>
+        <span className="text-xs text-muted-foreground">whoami.ts</span>
+      </div>
+      <div className="space-y-1.5 leading-relaxed">
+        <p>
+          <span className="text-primary">const</span>{" "}
+          <span className="text-foreground">developer</span> = {"{"}
+        </p>
+        <p className="pl-4 text-muted-foreground">
+          name: <span className="text-foreground">&quot;Oluwasegun&quot;</span>,
+        </p>
+        <p className="pl-4 text-muted-foreground">
+          role: <span className="text-foreground">&quot;Frontend Engineer&quot;</span>,
+        </p>
+        <p className="pl-4 text-muted-foreground">
+          location: <span className="text-foreground">&quot;Lagos, NG&quot;</span>,
+        </p>
+        <p className="pl-4 text-muted-foreground">
+          stack: [<span className="text-foreground">&quot;React&quot;, &quot;Next.js&quot;, &quot;TS&quot;</span>],
+        </p>
+        <p className="pl-4 text-muted-foreground">
+          available: <span className="text-success">true</span>,
+        </p>
+        <p className="text-foreground">{"}"}</p>
+      </div>
+    </motion.div>
   );
 }
 
@@ -114,146 +130,119 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative flex min-h-[calc(100vh-4rem)] flex-col items-center justify-center px-4 py-20 text-center overflow-hidden"
+      className="relative flex min-h-[calc(100vh-4rem)] flex-col justify-center py-20"
     >
-      {/* Radial glow behind content */}
-      <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-        <div className="h-[600px] w-[600px] rounded-full bg-violet-600/10 blur-[120px]" />
-      </div>
-      <div className="pointer-events-none absolute top-1/4 right-1/4 h-[300px] w-[300px] rounded-full bg-cyan-500/8 blur-[100px]" />
-
-      <div className="relative z-10 max-w-4xl">
-        {/* Availability badge */}
-        <motion.div
-          className="mb-8 inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400"
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.1 }}
-        >
-          <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
-          </span>
-          Available for new opportunities
-        </motion.div>
-
-        {/* Greeting */}
-        <motion.p
-          className="mb-3 text-lg font-medium text-muted-foreground"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-        >
-          Hello, I&apos;m
-        </motion.p>
-
-        {/* Name */}
-        <h1
-          className="mb-4 font-display text-6xl font-bold leading-none tracking-tight md:text-8xl lg:text-9xl"
-          style={{ perspective: "800px" }}
-        >
-          <AnimatedName name="Oluwasegun" />
-        </h1>
-
-        {/* Typewriter role */}
-        <motion.div
-          className="mb-6 font-display text-2xl font-semibold md:text-4xl"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.2 }}
-        >
-          <Typewriter words={ROLES} />
-        </motion.div>
-
-        {/* Tagline */}
-        <motion.p
-          className="mx-auto mb-10 max-w-xl text-base leading-relaxed text-muted-foreground md:text-lg"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.4 }}
-        >
-          I craft beautiful, performant, and accessible web experiences — blending
-          clean code with thoughtful design to build things people love using.
-        </motion.p>
-
-        {/* CTA buttons */}
-        <motion.div
-          className="mb-10 flex flex-wrap items-center justify-center gap-4"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 1.6 }}
-        >
-          {/* Primary CTA */}
-          <motion.button
-            onClick={scrollToProjects}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl px-7 py-3.5 text-sm font-semibold text-white transition-all duration-300"
-            style={{
-              background:
-                "linear-gradient(135deg, #7c3aed 0%, #5b21b6 50%, #06b6d4 100%)",
-              backgroundSize: "200% 200%",
-            }}
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+      <div className="grid items-center gap-16 lg:grid-cols-[1.15fr_0.85fr]">
+        {/* Left — intro */}
+        <div>
+          {/* Availability badge */}
+          <motion.div
+            className="mb-8 inline-flex items-center gap-2 rounded-full border border-success/30 bg-success/10 px-4 py-1.5 text-sm font-medium text-success"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <span className="relative z-10">View My Work</span>
-            <ArrowRight className="relative z-10 h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            {/* Shimmer overlay */}
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
-          </motion.button>
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+            </span>
+            Available for new opportunities
+          </motion.div>
 
-          {/* Secondary CTA */}
-          <motion.button
-            onClick={scrollToContact}
-            className="group relative inline-flex items-center gap-2 overflow-hidden rounded-xl border border-white/15 px-7 py-3.5 text-sm font-semibold text-foreground/80 backdrop-blur-sm transition-all duration-300 hover:text-white hover:border-violet-500/50 hover:bg-violet-500/10"
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
+          {/* Greeting + name */}
+          <motion.p
+            className="font-mono mb-3 text-sm text-muted-foreground"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.15 }}
           >
-            <span>Let&apos;s Talk</span>
-            <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
-          </motion.button>
-        </motion.div>
+            Hello, I&apos;m
+          </motion.p>
 
-        {/* Social links */}
-        <motion.div
-          className="flex items-center justify-center gap-3"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 1.8 }}
-        >
-          <SocialLink
-            href="https://github.com/Oluwasegun1"
-            icon={Github}
-            label="GitHub"
-          />
-          <SocialLink
-            href="https://www.linkedin.com/in/ogunbanjo-oluwasegun-b02831114/"
-            icon={Linkedin}
-            label="LinkedIn"
-          />
-          <SocialLink
-            href="https://x.com/OgunbanjoSegun2"
-            icon={Twitter}
-            label="Twitter / X"
-          />
-        </motion.div>
+          <motion.h1
+            className="font-display mb-4 text-5xl font-bold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            Oluwasegun
+          </motion.h1>
+
+          <motion.div
+            className="font-display mb-6 text-2xl font-semibold sm:text-3xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+          >
+            <Typewriter words={ROLES} />
+          </motion.div>
+
+          <motion.p
+            className="mb-10 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+          >
+            I build precise, performant web experiences — pairing clean React/Next.js
+            engineering with careful attention to detail across the whole interface.
+          </motion.p>
+
+          {/* CTAs */}
+          <motion.div
+            className="mb-10 flex flex-wrap items-center gap-4"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+          >
+            <Button size="xl" onClick={scrollToProjects} className="group gap-2">
+              View My Work
+              <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </Button>
+            <Button size="xl" variant="outline" onClick={scrollToContact} className="group gap-2">
+              Let&apos;s Talk
+              <ArrowDown className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+            </Button>
+          </motion.div>
+
+          {/* Socials */}
+          <motion.div
+            className="flex items-center gap-3"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+          >
+            <SocialLink href="https://github.com/Oluwasegun1" icon={Github} label="GitHub" />
+            <SocialLink
+              href="https://www.linkedin.com/in/ogunbanjo-oluwasegun-b02831114/"
+              icon={Linkedin}
+              label="LinkedIn"
+            />
+            <SocialLink href="https://x.com/OgunbanjoSegun2" icon={Twitter} label="Twitter / X" />
+          </motion.div>
+        </div>
+
+        {/* Right — identity card, hidden on small screens to avoid competing with the intro */}
+        <div className="hidden justify-self-center lg:flex lg:justify-self-end">
+          <IdentityCard />
+        </div>
       </div>
 
-      {/* Animated scroll indicator */}
+      {/* Scroll indicator */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
+        className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 0.8 }}
+        transition={{ delay: 1, duration: 0.6 }}
       >
-        <span className="text-[10px] font-medium tracking-widest text-muted-foreground/60 uppercase">
+        <span className="font-mono text-[10px] tracking-widest text-muted-foreground/60 uppercase">
           Scroll
         </span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ repeat: Infinity, duration: 1.8, ease: "easeInOut" }}
-          className="flex h-8 w-5 items-start justify-center rounded-full border border-white/20 pt-1.5"
+          className="flex h-8 w-5 items-start justify-center rounded-full border border-border pt-1.5"
         >
-          <div className="h-1.5 w-1 rounded-full bg-violet-400" />
+          <div className="h-1.5 w-1 rounded-full bg-primary" />
         </motion.div>
       </motion.div>
     </section>
