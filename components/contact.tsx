@@ -168,31 +168,44 @@ export default function Contact() {
   };
 
   const handleSubmit = async (evt: React.FormEvent) => {
-    evt.preventDefault();
-    setIsSubmitting(true);
-    setError("");
+  evt.preventDefault();
 
-    try {
-      await emailjs.send(
-        "service_o378fdi",
-        "template_gb0z2ch",
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message,
-          to_name: "Ogunbanjo Segun",
-        },
-        "P976aQ5n9mW_z0XaS"
-      );
-      setIsSubmitted(true);
-      setFormData({ name: "", email: "", message: "" });
-      setTimeout(() => setIsSubmitted(false), 6000);
-    } catch {
-      setError("Failed to send message. Please try again or email me directly.");
-    } finally {
-      setIsSubmitting(false);
+  setIsSubmitting(true);
+  setError("");
+
+  try {
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.error || "Failed to send message.");
     }
-  };
+
+    setIsSubmitted(true);
+    setFormData({
+      name: "",
+      email: "",
+      message: "",
+    });
+
+    setTimeout(() => setIsSubmitted(false), 6000);
+  } catch (error) {
+    setError(
+      error instanceof Error
+        ? error.message
+        : "Failed to send message."
+    );
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <section
