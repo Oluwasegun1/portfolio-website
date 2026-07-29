@@ -16,8 +16,8 @@ interface Stat {
 const STATS: Stat[] = [
   { icon: Rocket, value: 10, suffix: "+", label: "Projects Shipped" },
   { icon: Code2, value: 2, suffix: "+", label: "Years Experience" },
-  { icon: Layers, value: 10, suffix: "+", label: "Tools Mastered" },
-  { icon: Users, value: 5, suffix: "+", label: "Happy Clients" },
+  { icon: Layers, value: 10, suffix: "+", label: "Technologies Used" },
+  { icon: Users, value: 5, suffix: "+", label: "Clients Delivered For" },
 ];
 
 const PRINCIPLES = [
