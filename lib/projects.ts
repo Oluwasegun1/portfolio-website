@@ -18,6 +18,46 @@ export interface Project {
 
 export const PROJECTS: Project[] = [
   {
+    slug: "gopaddi-hr",
+    title: "Gopaddi HR",
+    tagline: "An enterprise HR management platform",
+    description:
+      "A full-featured HR platform covering the complete employee lifecycle — recruitment pipelines, onboarding, payroll, leave and shift management, attendance tracking, role-based permissions, and smart document generation — with bilingual (EN/FR) support.",
+    problem:
+      "HR teams were operating across disconnected tools with no unified view of employee data, leave schedules, or payroll. The platform needed to consolidate every HR workflow into a single, permissions-aware product while scaling cleanly across a large multi-feature codebase.",
+    role:
+      "I built and maintained feature modules across the HR dashboard — including employee management, leave requests, shift scheduling, and document workflows — using a strict feature-folder architecture, TanStack Query for server state, and Zustand for UI state.",
+    year: "2025",
+    image: "/gopaddi-hr.png",
+    technologies: ["React 19", "TypeScript", "TanStack Query", "Zustand", "Tailwind CSS", "Axios", "i18next"],
+    liveUrl: "https://workforce.gopaddi.com/en/",
+    highlights: [
+      "Built HR feature modules spanning employee management, leave requests, shift scheduling, and role-based permissions",
+      "Integrated TanStack Query across all data-fetching layers with consistent caching, error-handling, and optimistic update patterns",
+      "Implemented bilingual (EN/FR) i18n support across feature modules using scoped translation namespaces",
+    ],
+  },
+  {
+    slug: "goagent",
+    title: "GoAgent",
+    tagline: "A multi-vertical supplier dashboard for travel and hospitality",
+    description:
+      "A B2B platform for Gopaddi's supplier network. Agents manage travel, hotel, restaurant, POS, and workspace bookings from a single dashboard — alongside CRM tools, in-app VOIP calling via Callpad, a multi-currency wallet, AI-powered features, and real-time analytics.",
+    problem:
+      "Gopaddi's supplier ecosystem spanned multiple verticals but had no unified agent interface. Suppliers needed one dashboard to manage bookings, communicate with clients, track revenue, and access tools across all verticals without context-switching between separate apps.",
+    role:
+      "I worked across multiple verticals building and maintaining feature modules, shared components, and route files. Contributed to the Callpad VOIP integration, wallet transaction flows, multi-vertical routing architecture, and analytics views.",
+    year: "2024",
+    image: "/goagent.png",
+    technologies: ["React", "TypeScript", "Redux Toolkit", "TanStack Query", "Tailwind CSS", "Shadcn UI", "React Router"],
+    liveUrl: "https://supplier.gopaddi.com/en/",
+    highlights: [
+      "Contributed to a large multi-vertical SPA spanning travel, hotel, restaurant, POS, and workspace booking flows",
+      "Integrated Callpad VOIP SDK for in-app calling and built wallet flows with multi-currency support",
+      "Built and maintained feature-scoped modules with lazy-loaded routes, shared UI primitives, and Redux/TanStack Query state layers",
+    ],
+  },
+  {
     slug: "gopaddi",
     title: "Gopaddi",
     tagline: "A social-first travel booking ecosystem",

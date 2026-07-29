@@ -47,43 +47,22 @@ function ProjectImage({ project, priority }: { project: Project; priority?: bool
   );
 }
 
-type CardSize = "large" | "wide" | "normal";
-
-function ProjectCard({
-  project,
-  size,
-  index,
-}: {
-  project: Project;
-  size: CardSize;
-  index: number;
-}) {
+/** Uniform project card — same size across all slots for a consistent grid */
+function ProjectCard({ project, index }: { project: Project; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.15 }}
       transition={{ duration: 0.5, delay: (index % 3) * 0.08 }}
-      className={cn(
-        "group relative",
-        size === "large" && "lg:col-span-2 lg:row-span-2",
-        size === "wide" && "lg:col-span-2"
-      )}
+      className="group relative"
     >
       <Link
         href={`/work/${project.slug}`}
-        className={cn(
-          "focus-ring glass-card flex h-full flex-col overflow-hidden rounded-2xl transition-colors",
-          size === "wide" && "md:flex-row"
-        )}
+        className="focus-ring glass-card flex h-full flex-col overflow-hidden rounded-2xl transition-colors"
       >
-        <div
-          className={cn(
-            "relative overflow-hidden",
-            size === "wide" ? "aspect-video md:aspect-auto md:w-1/2" : "aspect-[4/3]",
-            size === "large" && "md:aspect-auto md:flex-1"
-          )}
-        >
+        {/* Image: 16:9 keeps cards compact and consistent across the row */}
+        <div className="relative aspect-video w-full overflow-hidden">
           <ProjectImage project={project} priority={index === 0} />
           {project.featured && (
             <span className="absolute left-4 top-4 inline-flex items-center gap-1.5 rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground">
@@ -92,26 +71,22 @@ function ProjectCard({
           )}
         </div>
 
-        <div
-          className={cn(
-            "flex flex-1 flex-col justify-center gap-3 p-6",
-            size === "wide" && "md:w-1/2"
-          )}
-        >
-          <div className="flex items-start justify-between gap-3">
-            <h3 className="font-display text-xl font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
-              {project.title}
-            </h3>
-            <ArrowUpRight className="h-5 w-5 shrink-0 text-muted-foreground transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
-          </div>
-          <p className="text-sm font-medium text-muted-foreground">{project.tagline}</p>
-          {(size === "large" || size === "wide") && (
-            <p className="text-sm leading-relaxed text-muted-foreground line-clamp-3">
+        {/* Content */}
+        <div className="flex flex-1 flex-col justify-between gap-3 p-5">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-start justify-between gap-3">
+              <h3 className="font-display text-lg font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+                {project.title}
+              </h3>
+              <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">{project.tagline}</p>
+            <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
               {project.description}
             </p>
-          )}
-          <div className="flex flex-wrap gap-1.5 pt-1">
-            {project.technologies.slice(0, size === "normal" ? 3 : 5).map((tech) => (
+          </div>
+          <div className="flex flex-wrap gap-1.5">
+            {project.technologies.slice(0, 4).map((tech) => (
               <TechBadge key={tech} label={tech} />
             ))}
           </div>
@@ -120,8 +95,6 @@ function ProjectCard({
     </motion.div>
   );
 }
-
-const SIZES: CardSize[] = ["large", "normal", "normal", "wide", "normal"];
 
 export default function Projects() {
   const sectionRef = useRef(null);
@@ -145,9 +118,9 @@ export default function Projects() {
         </p>
       </motion.div>
 
-      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-flow-dense lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
         {PROJECTS.map((project, index) => (
-          <ProjectCard key={project.slug} project={project} size={SIZES[index] ?? "normal"} index={index} />
+          <ProjectCard key={project.slug} project={project} index={index} />
         ))}
       </div>
 
