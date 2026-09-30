@@ -8,7 +8,7 @@ import { ArrowDown, Github, Linkedin, Twitter, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 /** Roles cycled through by the typewriter */
-const ROLES = ["Frontend Developer", "React Specialist", "UI Engineer", "Digital Craftsman"];
+const ROLES = ["Frontend Engineer", "React · TypeScript · Next.js", "AI Integration Engineer", "Design Systems Builder"];
 
 /** Typewriter — types and deletes a list of strings in a loop */
 function Typewriter({ words }: { words: string[] }) {
@@ -104,13 +104,19 @@ function IdentityCard() {
           role: <span className="text-foreground">&quot;Frontend Engineer&quot;</span>,
         </p>
         <p className="pl-4 text-muted-foreground">
+          company: <span className="text-foreground">&quot;Voyatek Group&quot;</span>,
+        </p>
+        <p className="pl-4 text-muted-foreground">
           location: <span className="text-foreground">&quot;Lagos, NG&quot;</span>,
         </p>
         <p className="pl-4 text-muted-foreground">
-          stack: [<span className="text-foreground">&quot;React&quot;, &quot;Next.js&quot;, &quot;TS&quot;</span>],
+          stack: [<span className="text-foreground">&quot;React 19&quot;, &quot;Next.js&quot;, &quot;TS&quot;</span>],
         </p>
         <p className="pl-4 text-muted-foreground">
-          available: <span className="text-success">true</span>,
+          ai: <span className="text-foreground">&quot;copilots &amp; assistants&quot;</span>,
+        </p>
+        <p className="pl-4 text-muted-foreground">
+          openTo: <span className="text-success">&quot;remote / relocation&quot;</span>,
         </p>
         <p className="text-foreground">{"}"}</p>
       </div>
@@ -146,7 +152,7 @@ export default function Hero() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
             </span>
-            Available for new opportunities
+            Open to Remote / Relocation
           </motion.div>
 
           {/* Greeting + name */}
@@ -183,8 +189,10 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
           >
-            I build precise, performant web experiences — pairing clean React/Next.js
-            engineering with careful attention to detail across the whole interface.
+            Software Engineer building AI-integrated and data-intensive products across four production
+            platforms — travel, hospitality, finance, and HR — serving{" "}
+            <span className="font-medium text-foreground">10,000+ registered users</span> and{" "}
+            <span className="font-medium text-foreground">100+ partner businesses</span> at Voyatek Group.
           </motion.p>
 
           {/* CTAs */}

@@ -7,11 +7,10 @@ import {
   FaReact,
   FaHtml5,
   FaCss3,
-  FaBootstrap,
   FaFigma,
   FaGitAlt,
 } from "react-icons/fa";
-import { SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss, SiGreensock, SiRedux } from "react-icons/si";
+import { SiNextdotjs, SiTypescript, SiJavascript, SiTailwindcss } from "react-icons/si";
 
 interface Skill {
   name: string;
@@ -25,32 +24,63 @@ interface SkillGroup {
 
 const GROUPS: SkillGroup[] = [
   {
-    title: "Languages & Frameworks",
+    title: "Core Languages & Frameworks",
     skills: [
-      { name: "React", icon: <FaReact /> },
+      { name: "React 19", icon: <FaReact /> },
       { name: "Next.js", icon: <SiNextdotjs /> },
       { name: "TypeScript", icon: <SiTypescript /> },
-      { name: "JavaScript", icon: <SiJavascript /> },
+      { name: "JavaScript (ES6+)", icon: <SiJavascript /> },
       { name: "HTML5", icon: <FaHtml5 /> },
       { name: "CSS3", icon: <FaCss3 /> },
     ],
   },
   {
-    title: "Styling & Motion",
+    title: "UI, Styling & Motion",
     skills: [
       { name: "Tailwind CSS", icon: <SiTailwindcss /> },
+      { name: "Shadcn UI", icon: <span className="text-[10px] font-bold">SH</span> },
+      { name: "Radix UI", icon: <span className="text-[10px] font-bold">RX</span> },
       { name: "Framer Motion", icon: <span className="text-[10px] font-bold">FM</span> },
-      { name: "GSAP", icon: <SiGreensock /> },
-      { name: "Bootstrap", icon: <FaBootstrap /> },
+      { name: "Figma-to-code", icon: <FaFigma /> },
     ],
   },
   {
-    title: "Tools & Workflow",
+    title: "State & Data",
     skills: [
-      { name: "Git", icon: <FaGitAlt /> },
-      { name: "Redux", icon: <SiRedux /> },
-      { name: "Figma", icon: <FaFigma /> },
-      { name: "REST APIs", icon: <span className="text-[10px] font-bold">{"{ }"}</span> },
+      { name: "TanStack Query v5", icon: <span className="text-[10px] font-bold">TQ</span> },
+      { name: "Zustand 5", icon: <span className="text-[10px] font-bold">ZS</span> },
+      { name: "react-hook-form", icon: <span className="text-[10px] font-bold">RHF</span> },
+      { name: "Zod 4", icon: <span className="text-[10px] font-bold">ZD</span> },
+      { name: "REST / GraphQL", icon: <span className="text-[10px] font-bold">{"{ }"}</span> },
+      { name: "Axios", icon: <span className="text-[10px] font-bold">AX</span> },
+    ],
+  },
+  {
+    title: "Real-time & Offline",
+    skills: [
+      { name: "WebSockets", icon: <span className="text-[10px] font-bold">WS</span> },
+      { name: "PWA / Service Workers", icon: <span className="text-[10px] font-bold">PWA</span> },
+      { name: "IndexedDB", icon: <span className="text-[10px] font-bold">IDB</span> },
+      { name: "Pusher / Reverb", icon: <span className="text-[10px] font-bold">PS</span> },
+    ],
+  },
+  {
+    title: "Testing & Performance",
+    skills: [
+      { name: "Vitest", icon: <span className="text-[10px] font-bold">VT</span> },
+      { name: "Testing Library", icon: <span className="text-[10px] font-bold">TL</span> },
+      { name: "Playwright", icon: <span className="text-[10px] font-bold">PW</span> },
+      { name: "Core Web Vitals", icon: <span className="text-[10px] font-bold">CW</span> },
+    ],
+  },
+  {
+    title: "Integrations & Tooling",
+    skills: [
+      { name: "Paystack / Flutterwave", icon: <span className="text-[10px] font-bold">PAY</span> },
+      { name: "Git / GitHub", icon: <FaGitAlt /> },
+      { name: "CI/CD / Docker", icon: <span className="text-[10px] font-bold">CD</span> },
+      { name: "Vercel", icon: <span className="text-[10px] font-bold">▲</span> },
+      { name: "PostHog / Sentry", icon: <span className="text-[10px] font-bold">🔭</span> },
     ],
   },
 ];
@@ -115,12 +145,12 @@ export default function Skills() {
           My <span className="text-primary">Skills</span>
         </h2>
         <p className="mx-auto mt-4 max-w-xl text-muted-foreground">
-          The languages, frameworks, and tools I reach for daily to build
-          production-quality interfaces.
+          The full stack I use daily to ship AI-integrated, production-quality
+          interfaces — from design system to deployment.
         </p>
       </motion.div>
 
-      <div className="mx-auto grid max-w-5xl gap-6 lg:grid-cols-3">
+      <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2 lg:grid-cols-3">
         {GROUPS.map((group, groupIndex) => (
           <div key={group.title} className="rounded-2xl border border-border p-6">
             <h3 className="font-mono mb-4 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">

@@ -132,12 +132,33 @@ export const PROJECTS: Project[] = [
     year: "2023",
     image: "/restaurant-landing.png",
     technologies: ["React", "Next.js", "Tailwind CSS", "Redux"],
-    liveUrl: "https://gerich-resturants.vercel.app/",
+    liveUrl: "https://gerich-restaurants.vercel.app/",
     githubUrl: "https://github.com/Oluwasegun1/gerich-resturants",
     highlights: [
       "Designed an information hierarchy that keeps reservations one tap away on mobile",
       "Built a featured-dishes section with lightweight, dependency-free image transitions",
       "Managed shared UI state with Redux across the menu and reservation flows",
+    ],
+  },
+  {
+    slug: "credit-card-fraud-detection",
+    title: "Credit Card Fraud Detection",
+    tagline: "Ensemble ML models for financial fraud classification",
+    description:
+      "Trained and compared ensemble models (XGBoost, Random Forest, KNN, Logistic Regression) to classify fraudulent credit card transactions. Evaluated with precision-recall curves and F1 scores to handle class imbalance.",
+    problem:
+      "Credit card fraud datasets are highly imbalanced, making naive accuracy a misleading metric. The challenge was selecting and tuning models that maximise recall on the minority fraud class without flooding the fraud queue with false positives.",
+    role:
+      "End-to-end ML pipeline: data preprocessing and resampling, feature engineering, training four model variants, hyperparameter tuning, and comparative evaluation using precision-recall curves and F1 scoring.",
+    year: "2024",
+    image: "/restaurant-landing.png",
+    technologies: ["Python", "Scikit-Learn", "XGBoost", "Random Forest", "Pandas"],
+    liveUrl: "https://github.com/Oluwasegun1",
+    githubUrl: "https://github.com/Oluwasegun1",
+    highlights: [
+      "Compared XGBoost, Random Forest, KNN, and Logistic Regression on a heavily imbalanced dataset",
+      "Used precision-recall curves and F1 scores to evaluate classifier performance beyond raw accuracy",
+      "Applied resampling techniques to improve recall on the minority fraud class",
     ],
   },
   {

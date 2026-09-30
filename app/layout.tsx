@@ -31,19 +31,24 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://oluwasegun-portfol
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Oluwasegun Ogunbanjo — Frontend Developer",
+    default: "Oluwasegun Ogunbanjo — Frontend Engineer",
     template: "%s · Oluwasegun Ogunbanjo",
   },
   description:
-    "Frontend Developer crafting precise, performant, and accessible web experiences with React, Next.js, and TypeScript. Based in Lagos, Nigeria.",
+    "Frontend Engineer building AI-integrated and data-intensive products across four production platforms. React 19, TypeScript, Next.js. Based in Lagos, Nigeria — open to remote / relocation.",
   keywords: [
-    "Frontend Developer",
+    "Frontend Engineer",
     "React Developer",
     "Next.js",
+    "TypeScript",
+    "AI Integration",
     "Oluwasegun Ogunbanjo",
     "Lagos",
     "Web Developer",
     "UI Engineer",
+    "TanStack Query",
+    "Gopaddi",
+    "Voyatek",
   ],
   authors: [{ name: "Ogunbanjo Oluwasegun", url: SITE_URL }],
   creator: "Ogunbanjo Oluwasegun",
@@ -54,9 +59,9 @@ export const metadata: Metadata = {
     type: "website",
     url: "/",
     locale: "en_US",
-    title: "Oluwasegun Ogunbanjo — Frontend Developer",
+    title: "Oluwasegun Ogunbanjo — Frontend Engineer",
     description:
-      "Crafting precise, performant web experiences with React & Next.js.",
+      "Building AI-integrated, production-grade platforms with React 19, TypeScript & Next.js.",
     siteName: "Oluwasegun Ogunbanjo",
   },
   twitter: {

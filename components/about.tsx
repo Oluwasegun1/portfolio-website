@@ -14,32 +14,32 @@ interface Stat {
 }
 
 const STATS: Stat[] = [
-  { icon: Rocket, value: 10, suffix: "+", label: "Projects Shipped" },
-  { icon: Code2, value: 2, suffix: "+", label: "Years Experience" },
-  { icon: Layers, value: 10, suffix: "+", label: "Technologies Used" },
-  { icon: Users, value: 5, suffix: "+", label: "Clients Delivered For" },
+  { icon: Rocket, value: 4, suffix: "", label: "Production Platforms" },
+  { icon: Code2, value: 3, suffix: "+", label: "Years Experience" },
+  { icon: Users, value: 10, suffix: "k+", label: "Registered Users" },
+  { icon: Layers, value: 100, suffix: "+", label: "Partner Businesses" },
 ];
 
 const PRINCIPLES = [
   {
     icon: Zap,
     title: "Performance-first",
-    description: "Every interaction is measured, not assumed — fast by default.",
+    description: "Route splitting, TanStack Query caching, and PWA offline storage — measurable, not assumed.",
   },
   {
     icon: Eye,
-    title: "Detail-obsessed",
-    description: "Spacing, motion, and edge-case states are never an afterthought.",
+    title: "Systems thinker",
+    description: "Registry-driven architectures and shared component libraries that scale across teams.",
   },
   {
     icon: Accessibility,
-    title: "Accessible by default",
-    description: "Keyboard, screen-reader, and reduced-motion support, built in.",
+    title: "AI-integrated engineering",
+    description: "Shipped 3 production AI assistants: trip planning, financial copilot, and HR policy Q&A.",
   },
   {
     icon: GitBranch,
-    title: "Ship & iterate",
-    description: "Clean, typed code that's easy for a team to extend and hand off.",
+    title: "Security-conscious",
+    description: "End-to-end payload encryption, RBAC across 30+ modules, and disciplined mutation validation.",
   },
 ];
 
@@ -110,22 +110,24 @@ export default function About() {
           className="flex flex-col justify-center"
         >
           <h3 className="font-display mb-4 text-2xl font-semibold">
-            Turning ideas into <span className="text-primary">production-ready</span> interfaces
+            Building AI-integrated,{" "}
+            <span className="text-primary">production-grade</span> platforms
           </h3>
           <p className="mb-4 leading-relaxed text-muted-foreground">
-            I&apos;m a frontend developer based in{" "}
-            <span className="font-medium text-foreground">Lagos, Nigeria</span>, focused on
-            building interfaces that are functional, fast, and genuinely pleasant to use.
+            I&apos;m a Frontend Engineer at{" "}
+            <span className="font-medium text-foreground">Voyatek Group</span> based in{" "}
+            <span className="font-medium text-foreground">Lagos, Nigeria</span>, building across four
+            concurrent products in the Gopaddi travel, hospitality, finance, and HR ecosystem.
           </p>
           <p className="mb-6 leading-relaxed text-muted-foreground">
-            With hands-on experience shipping production applications for platforms like{" "}
-            <span className="font-medium text-foreground">Gopaddi</span> and{" "}
-            <span className="font-medium text-foreground">DiscovaTrips</span>, I specialize in
-            the React/Next.js ecosystem, pixel-accurate implementation, and performance-first
-            development.
+            I&apos;ve shipped three production AI assistants, architected a registry-driven reporting
+            engine that cut new-report delivery from two days to under two hours, and built RBAC gating
+            30+ modules — all while maintaining the{" "}
+            <span className="font-medium text-foreground">Jungle shared component library</span> adopted
+            across all four products.
           </p>
           <a
-            href="/Oluwasegun-Ogunbanjo-Resume.pdf"
+            href="/OLUWASEGUN IFEOLUWA OGUNBANJO RESUME.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="focus-ring inline-flex w-fit items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-accent"

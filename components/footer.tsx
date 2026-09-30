@@ -7,6 +7,7 @@ import { Github, Linkedin, Twitter, Instagram, ArrowUp } from "lucide-react";
 const NAV_LINKS = [
   { label: "Home", href: "home" },
   { label: "About", href: "about" },
+  { label: "Experience", href: "experience" },
   { label: "Projects", href: "projects" },
   { label: "Skills", href: "skills" },
   { label: "Contact", href: "contact" },
@@ -63,8 +64,8 @@ export default function Footer() {
               </div>
               <span className="font-display text-base font-semibold">Oluwasegun</span>
             </div>
-            <p className="max-w-[220px] text-xs leading-relaxed text-muted-foreground">
-              Frontend Developer crafting precise web experiences, one component at a time.
+            <p className="max-w-[240px] text-xs leading-relaxed text-muted-foreground">
+              Frontend Engineer building AI-integrated, production-grade platforms in the Gopaddi ecosystem.
             </p>
             <p className="font-mono text-xs text-muted-foreground/60">Lagos, Nigeria</p>
           </div>

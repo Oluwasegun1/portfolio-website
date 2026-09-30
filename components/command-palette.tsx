@@ -18,6 +18,7 @@ import {
   Github,
   Linkedin,
   ExternalLink,
+  Clock,
 } from "lucide-react";
 import {
   CommandDialog,
@@ -34,6 +35,7 @@ import { PROJECTS } from "@/lib/projects";
 const SECTION_ITEMS = [
   { id: "home", label: "Home", icon: Home },
   { id: "about", label: "About", icon: User },
+  { id: "experience", label: "Experience", icon: Clock },
   { id: "projects", label: "Projects", icon: Briefcase },
   { id: "skills", label: "Skills", icon: Layers },
   { id: "contact", label: "Contact", icon: Mail },
@@ -135,7 +137,7 @@ export default function CommandPalette() {
           <CommandItem
             onSelect={() =>
               runCommand(() => {
-                window.open("/Oluwasegun-Ogunbanjo-Resume.pdf", "_blank");
+                window.open("/OLUWASEGUN IFEOLUWA OGUNBANJO RESUME.pdf", "_blank");
               })
             }
           >
