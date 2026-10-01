@@ -3,7 +3,7 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "framer-motion";
-import { Briefcase, Calendar, MapPin, ChevronRight } from "lucide-react";
+import { Briefcase, Calendar, MapPin, ChevronRight, Download } from "lucide-react";
 
 interface Role {
   title: string;
@@ -33,6 +33,7 @@ const ROLES: Role[] = [
       "Delivered the full double-entry accounting lifecycle on Gopaddi Books plus bank reconciliation with a rules engine and Mono Connect for account linking.",
       "Developed an end-to-end recruitment ATS spanning job requests, approval workflows, a Kanban candidate pipeline, referral tracking, and a public careers board.",
       "Improved performance via React.lazy() route splitting, Vite chunk config, TanStack Query caching, and PWA + IndexedDB for offline CSV import and data-cleaning workflows.",
+      "Run a frontend engineering bootcamp, mentoring early-career developers on React, TypeScript, and production-ready engineering practices.",
     ],
   },
   {
@@ -86,7 +87,8 @@ function RoleCard({ role, index }: { role: Role; index: number }) {
               <h3 className="font-display text-lg font-bold text-foreground">{role.title}</h3>
               {role.current && (
                 <span className="inline-flex items-center gap-1 rounded-full border border-success/30 bg-success/10 px-2.5 py-0.5 text-xs font-medium text-success">
-                  <span className="relative flex h-1.5 w-1.5">
+                  {/* Ping is decorative — the word "Current" provides the label */}
+                  <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                     <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
                   </span>
@@ -98,11 +100,11 @@ function RoleCard({ role, index }: { role: Role; index: number }) {
           </div>
           <div className="flex flex-col items-end gap-1 text-right">
             <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Calendar className="h-3 w-3" />
+              <Calendar className="h-3 w-3" aria-hidden="true" />
               {role.period}
             </span>
             <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3" />
+              <MapPin className="h-3 w-3" aria-hidden="true" />
               {role.location}
             </span>
           </div>
@@ -112,7 +114,7 @@ function RoleCard({ role, index }: { role: Role; index: number }) {
         <ul className="space-y-2.5">
           {role.highlights.map((point, i) => (
             <li key={i} className="flex items-start gap-2.5 text-sm leading-relaxed text-muted-foreground">
-              <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+              <ChevronRight className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
               {point}
             </li>
           ))}
@@ -157,7 +159,7 @@ export default function Experience() {
         >
           <div className="rounded-xl border border-border bg-accent/20 px-5 py-4">
             <p className="font-mono mb-2 text-xs font-medium uppercase tracking-[0.15em] text-muted-foreground flex items-center gap-2">
-              <Briefcase className="h-3.5 w-3.5" />
+              <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />
               Earlier Experience
             </p>
             <ul className="space-y-1">
@@ -170,6 +172,24 @@ export default function Experience() {
           </div>
         </motion.div>
       </div>
+
+      {/* Resume CTA */}
+      <motion.div
+        className="mt-10 flex justify-center"
+        initial={{ opacity: 0, y: 16 }}
+        animate={isInView ? { opacity: 1, y: 0 } : {}}
+        transition={{ duration: 0.5, delay: 0.4 }}
+      >
+        <a
+          href="/OLUWASEGUN%20IFEOLUWA%20OGUNBANJO%20RESUME.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="focus-ring inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
+        >
+          <Download className="h-4 w-4" aria-hidden="true" />
+          Download Full Resume
+        </a>
+      </motion.div>
     </section>
   );
 }

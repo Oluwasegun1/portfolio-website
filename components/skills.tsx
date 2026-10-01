@@ -56,6 +56,17 @@ const GROUPS: SkillGroup[] = [
     ],
   },
   {
+    title: "Architecture & Patterns",
+    skills: [
+      { name: "SSR / ISR (Next.js)", icon: <span className="text-[10px] font-bold">SR</span> },
+      { name: "Microfrontends", icon: <span className="text-[10px] font-bold">MF</span> },
+      { name: "Feature-folder structure", icon: <span className="text-[10px] font-bold">FF</span> },
+      { name: "i18next / i18n", icon: <span className="text-[10px] font-bold">I18</span> },
+      { name: "RBAC patterns", icon: <span className="text-[10px] font-bold">🔐</span> },
+      { name: "Design systems", icon: <span className="text-[10px] font-bold">DS</span> },
+    ],
+  },
+  {
     title: "Real-time & Offline",
     skills: [
       { name: "WebSockets", icon: <span className="text-[10px] font-bold">WS</span> },
@@ -107,7 +118,9 @@ function SkillTag({ skill, delay, isInView }: { skill: Skill; delay: number; isI
 function SkillsMarquee() {
   const items = [...MARQUEE_ITEMS, ...MARQUEE_ITEMS];
   return (
-    <div className="relative mt-14 overflow-hidden py-4">
+    // aria-hidden: purely decorative duplicate of the grid above — saves screen
+    // reader users from traversing 80+ repeated items
+    <div className="relative mt-14 overflow-hidden py-4" aria-hidden="true">
       <div className="absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-background to-transparent" />
       <div className="absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-background to-transparent" />
 

@@ -5,7 +5,7 @@ import "./globals.css";
 import { AppProviders } from "@/components/app-providers";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { Metadata } from "next";
+import { Metadata, Viewport } from "next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -26,6 +26,9 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
+// Set NEXT_PUBLIC_SITE_URL in your Vercel environment variables to your canonical
+// domain (e.g., "https://oluwasegundev.com"). If unset, falls back to the Vercel
+// deployment URL. Keeping one source of truth here avoids split indexing.
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://oluwasegun-portfolio.vercel.app";
 
 export const metadata: Metadata = {
@@ -35,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s · Oluwasegun Ogunbanjo",
   },
   description:
-    "Frontend Engineer building AI-integrated and data-intensive products across four production platforms. React 19, TypeScript, Next.js. Based in Lagos, Nigeria — open to remote / relocation.",
+    "Frontend Engineer at Voyatek Group — shipped 4 production platforms (travel, hospitality, finance, HR) with React 19, TypeScript & Next.js, including 3 AI assistants and RBAC across 30+ modules. Open to remote / relocation.",
   keywords: [
     "Frontend Engineer",
     "React Developer",
@@ -53,23 +56,32 @@ export const metadata: Metadata = {
   authors: [{ name: "Ogunbanjo Oluwasegun", url: SITE_URL }],
   creator: "Ogunbanjo Oluwasegun",
   alternates: {
-    canonical: "/",
+    canonical: SITE_URL,
   },
   openGraph: {
     type: "website",
-    url: "/",
+    url: SITE_URL,
     locale: "en_US",
     title: "Oluwasegun Ogunbanjo — Frontend Engineer",
     description:
-      "Building AI-integrated, production-grade platforms with React 19, TypeScript & Next.js.",
+      "Frontend Engineer at Voyatek Group — 4 production platforms, 3 AI assistants, 30+ RBAC modules. React 19, TypeScript & Next.js.",
     siteName: "Oluwasegun Ogunbanjo",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "Oluwasegun Ogunbanjo — Frontend Engineer portfolio",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Oluwasegun Ogunbanjo — Frontend Developer",
+    title: "Oluwasegun Ogunbanjo — Frontend Engineer",
     description:
-      "Crafting precise, performant web experiences with React & Next.js.",
+      "Crafting precise, performant web experiences with React & Next.js. 4 production platforms, 3 AI assistants.",
     creator: "@OgunbanjoSegun2",
+    images: ["/opengraph-image"],
   },
   icons: {
     icon: [
@@ -83,18 +95,33 @@ export const metadata: Metadata = {
   },
 };
 
+/** Viewport — themeColor must live here (not in metadata) from Next.js 14+ */
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: dark)", color: "#0d0d0f" },
+    { media: "(prefers-color-scheme: light)", color: "#faf9f7" },
+  ],
+};
+
 /** Structured data describing the site owner — helps search engines render a rich profile card */
 const personJsonLd = {
   "@context": "https://schema.org",
   "@type": "Person",
   name: "Ogunbanjo Oluwasegun",
-  jobTitle: "Frontend Developer",
+  // Consistent with metadata title — avoid split signals
+  jobTitle: "Frontend Engineer",
   url: SITE_URL,
-  email: "mailto:ogunbanjosegun@gmail.com",
+  email: "ogunbanjosegun@gmail.com",
   address: {
     "@type": "PostalAddress",
     addressLocality: "Lagos",
     addressCountry: "NG",
+  },
+  // worksFor adds a rich Organization entity understood by Google's knowledge graph
+  worksFor: {
+    "@type": "Organization",
+    name: "Voyatek Group",
+    url: "https://voyatek.com",
   },
   sameAs: [
     "https://github.com/Oluwasegun1",
@@ -121,6 +148,13 @@ export default function RootLayout({
         />
       </head>
       <body className={inter.className}>
+        {/* Fallback for users/bots with JavaScript disabled */}
+        <noscript>
+          <div style={{ padding: "1rem", textAlign: "center", fontFamily: "sans-serif" }}>
+            This portfolio uses JavaScript for animations and interactivity.
+            Please enable JavaScript for the best experience.
+          </div>
+        </noscript>
         <AppProviders>
           {/* Skip link — first focusable element, only visible while focused */}
           <a href="#main-content" className="skip-link">

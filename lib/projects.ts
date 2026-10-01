@@ -12,31 +12,17 @@ export interface Project {
   technologies: string[];
   liveUrl: string;
   githubUrl?: string;
+  /** Set when the codebase is private corporate code. Displayed as a badge on the case study. */
+  privateNote?: string;
   highlights: string[];
+  /** "Decisions & Trade-offs" section — why specific architectural choices were made */
+  decisions?: { title: string; rationale: string }[];
+  /** "Results" section — measured or scoped outcomes */
+  results?: string[];
   featured?: boolean;
 }
 
 export const PROJECTS: Project[] = [
-  {
-    slug: "gopaddi-hr",
-    title: "Gopaddi HR",
-    tagline: "An enterprise HR management platform",
-    description:
-      "A full-featured HR platform covering the complete employee lifecycle — recruitment pipelines, onboarding, payroll, leave and shift management, attendance tracking, role-based permissions, and smart document generation — with bilingual (EN/FR) support.",
-    problem:
-      "HR teams were operating across disconnected tools with no unified view of employee data, leave schedules, or payroll. The platform needed to consolidate every HR workflow into a single, permissions-aware product while scaling cleanly across a large multi-feature codebase.",
-    role:
-      "I built and maintained feature modules across the HR dashboard — including employee management, leave requests, shift scheduling, and document workflows — using a strict feature-folder architecture, TanStack Query for server state, and Zustand for UI state.",
-    year: "2025",
-    image: "/gopaddi-hr.png",
-    technologies: ["React 19", "TypeScript", "TanStack Query", "Zustand", "Tailwind CSS", "Axios", "i18next"],
-    liveUrl: "https://workforce.gopaddi.com/en/",
-    highlights: [
-      "Built HR feature modules spanning employee management, leave requests, shift scheduling, and role-based permissions",
-      "Integrated TanStack Query across all data-fetching layers with consistent caching, error-handling, and optimistic update patterns",
-      "Implemented bilingual (EN/FR) i18n support across feature modules using scoped translation namespaces",
-    ],
-  },
   {
     slug: "goagent",
     title: "GoAgent",
@@ -51,10 +37,80 @@ export const PROJECTS: Project[] = [
     image: "/goagent.png",
     technologies: ["React", "TypeScript", "Redux Toolkit", "TanStack Query", "Tailwind CSS", "Shadcn UI", "React Router"],
     liveUrl: "https://supplier.gopaddi.com/en/",
+    privateNote: "Closed-source — company code on Azure DevOps (Voyatek Group). Live app linked above.",
     highlights: [
-      "Contributed to a large multi-vertical SPA spanning travel, hotel, restaurant, POS, and workspace booking flows",
-      "Integrated Callpad VOIP SDK for in-app calling and built wallet flows with multi-currency support",
-      "Built and maintained feature-scoped modules with lazy-loaded routes, shared UI primitives, and Redux/TanStack Query state layers",
+      "Contributed to a large multi-vertical SPA spanning travel, hotel, restaurant, POS, and workspace booking flows across 13 verticals",
+      "Integrated Callpad VOIP SDK for in-app calling and built wallet flows with multi-currency support and transaction history",
+      "Built feature-scoped modules with lazy-loaded routes, shared UI primitives, and Redux/TanStack Query state layers",
+      "Implemented end-to-end API payload encryption (RSA-OAEP + AES-256-GCM) via Axios interceptors, protecting data across all supplier flows",
+    ],
+    decisions: [
+      {
+        title: "Redux Toolkit + TanStack Query (dual state layers)",
+        rationale:
+          "Redux Toolkit owns complex cross-vertical UI state — active booking context, wallet balance, VOIP call status — that multiple routes read simultaneously. TanStack Query handles all server state with stale-while-revalidate caching; this split prevents cache invalidation from triggering unrelated UI re-renders and keeps bundle size predictable via code splitting.",
+      },
+      {
+        title: "Feature-folder structure",
+        rationale:
+          "With 13 verticals in a single SPA, a flat components/ directory would have created merge conflicts and unclear ownership. Each vertical owns its own feature/ folder (routes, components, hooks, types) — a team member can ship a restaurant feature without touching travel code.",
+      },
+      {
+        title: "Axios interceptors for E2E encryption",
+        rationale:
+          "Centralising RSA-OAEP + AES-256-GCM encryption in request/response interceptors means individual feature developers don't need to handle crypto themselves, reducing the risk of missed encryption at the call site.",
+      },
+    ],
+    results: [
+      "Consolidated 13 travel and hospitality verticals into a single supplier SPA — eliminating the need for separate portals",
+      "End-to-end payload encryption rolled out across all supplier API traffic via a single interceptor layer",
+      "Lazy-loaded route splitting reduced initial JS bundle size and improved time-to-interactive on slower connections",
+    ],
+    featured: true,
+  },
+  {
+    slug: "gopaddi-hr",
+    title: "Gopaddi HR",
+    tagline: "An enterprise HR management platform",
+    description:
+      "A full-featured HR platform covering the complete employee lifecycle — recruitment pipelines, onboarding, payroll, leave and shift management, attendance tracking, role-based permissions, and smart document generation — with bilingual (EN/FR) support.",
+    problem:
+      "HR teams were operating across disconnected tools with no unified view of employee data, leave schedules, or payroll. The platform needed to consolidate every HR workflow into a single, permissions-aware product while scaling cleanly across a large multi-feature codebase.",
+    role:
+      "I built and maintained feature modules across the HR dashboard — including employee management, leave requests, shift scheduling, and document workflows — using a strict feature-folder architecture, TanStack Query for server state, and Zustand for UI state.",
+    year: "2025",
+    image: "/gopaddi-hr.png",
+    technologies: ["React 19", "TypeScript", "TanStack Query", "Zustand", "Tailwind CSS", "Axios", "i18next"],
+    liveUrl: "https://workforce.gopaddi.com/en/",
+    privateNote: "Closed-source — company code on Azure DevOps (Voyatek Group). Live app linked above.",
+    highlights: [
+      "Built 30+ RBAC-gated feature modules covering payroll, leave, attendance, recruitment ATS, and multi-entity org management",
+      "Implemented shared TanStack Query caching across HR modules — eliminating duplicate API requests and ensuring consistent data across views",
+      "Delivered bilingual (EN/FR) i18next support across all modules using scoped translation namespaces",
+      "Integrated Flutterwave for payroll funding and payslip generation; built recruitment ATS with Kanban pipeline and public careers board",
+    ],
+    decisions: [
+      {
+        title: "Zustand for UI state, TanStack Query for server state",
+        rationale:
+          "HR dashboards have two very different state problems: ephemeral UI state (modal open, active tab, form step) that belongs in the component tree, and server data (leave balances, payroll runs) that needs caching, background refetching, and invalidation. Mixing them in a single store creates unnecessary re-renders. Zustand's small API handles UI state with zero boilerplate; TanStack Query owns server state with stale-while-revalidate semantics — each tool does one job well.",
+      },
+      {
+        title: "Feature-folder architecture",
+        rationale:
+          "An HR platform with 30+ modules (payroll, leave, attendance, recruitment…) can't be maintained in a flat components/ directory. Co-locating each feature's routes, components, hooks, and types in a features/[name]/ folder gives clear ownership, makes PRs easier to review, and prevents accidental coupling between unrelated modules.",
+      },
+      {
+        title: "Scoped i18n namespaces (i18next)",
+        rationale:
+          "Loading all EN/FR strings into a single namespace would cause a large initial bundle and make translations hard to manage across 30+ modules. Scoped namespaces (leave.json, payroll.json…) load lazily per route, keep translation files small and PR-reviewable, and make it easy to hand off individual namespaces to translators.",
+      },
+    ],
+    results: [
+      "Consolidated HR operations for an enterprise workforce platform into 30+ RBAC-gated modules — replacing disconnected spreadsheet and manual workflows",
+      "Shared TanStack Query caching cut duplicate API requests across views, reducing server load on high-traffic HR screens",
+      "Full EN/FR bilingual coverage delivered across all modules — enabling rollout to French-speaking enterprise clients",
+      "Recruitment ATS with Kanban pipeline and public careers board shipped end-to-end within the same codebase",
     ],
   },
   {
@@ -71,12 +127,23 @@ export const PROJECTS: Project[] = [
     image: "/gopaddi.png",
     technologies: ["React", "Next.js", "Axios", "Tailwind CSS", "API Integration"],
     liveUrl: "https://www.gopaddi.com/",
+    privateNote: "Closed-source — company code on Azure DevOps (Voyatek Group). Live app linked above.",
     highlights: [
-      "Shipped a responsive trip-planning dashboard used across booking, discovery, and social flows",
+      "Shipped a responsive trip-planning dashboard used across booking, discovery, and social flows serving 10,000+ registered users",
       "Built live-streaming UI with real-time state handling and graceful fallback states",
       "Integrated a marketplace listing system against REST APIs with pagination and filtering",
     ],
-    featured: true,
+    decisions: [
+      {
+        title: "Next.js for SSR on public-facing pages",
+        rationale:
+          "Discovery and marketplace pages are crawled by search engines — server-rendering them ensures content is indexed immediately and time-to-first-byte stays fast even for users on slow mobile connections in target markets.",
+      },
+    ],
+    results: [
+      "Platform serves 10,000+ registered users and 100+ partner businesses",
+      "Social and booking flows unified into a single responsive surface — reducing the need for separate apps per use case",
+    ],
   },
   {
     slug: "discovatrips",
@@ -92,10 +159,22 @@ export const PROJECTS: Project[] = [
     image: "/discova.png",
     technologies: ["React", "Next.js", "Framer Motion", "Axios", "Tailwind CSS"],
     liveUrl: "https://www.discovatrips.com",
+    privateNote: "Closed-source — company code on Azure DevOps (Voyatek Group). Live app linked above.",
     highlights: [
       "Built a themed-trip browsing experience with smooth, motion-driven transitions",
       "Implemented a highlight gallery pattern reused across traveler profiles",
-      "Optimized image-heavy views for fast mobile load times",
+      "Optimized image-heavy views for fast mobile load times with Next.js Image and lazy loading",
+    ],
+    decisions: [
+      {
+        title: "Framer Motion for declarative animation",
+        rationale:
+          "A discovery product lives or dies on feel. Framer Motion's layout animations and shared-element transitions gave the gallery and trip-card interactions an app-like quality without hand-rolling requestAnimationFrame logic. Animations are conditionally skipped via prefers-reduced-motion.",
+      },
+    ],
+    results: [
+      "Image-heavy gallery pages optimized for mobile — core screens load within LCP budget using Next.js Image with blur placeholders",
+      "Highlight gallery component reused across 3+ traveler-profile page types without modification",
     ],
   },
   {
@@ -118,6 +197,17 @@ export const PROJECTS: Project[] = [
       "Synced a Three.js 3D model sequence to scroll position for camera/product transitions",
       "Kept scroll-jacked sections performant with careful animation batching",
     ],
+    decisions: [
+      {
+        title: "Three.js + GSAP ScrollTrigger (not a CSS-only approach)",
+        rationale:
+          "The 3D model needs to respond to scroll position in real time — CSS scroll animations can't drive WebGL uniforms. GSAP ScrollTrigger was chosen as the single orchestration layer to avoid two independent scroll listeners fighting each other.",
+      },
+    ],
+    results: [
+      "Recreation exercise completed — publicly viewable with full source code on GitHub",
+      "Demonstrates GSAP ScrollTrigger + Three.js integration, used as an animation engineering reference",
+    ],
   },
   {
     slug: "gerich-restaurant",
@@ -138,6 +228,9 @@ export const PROJECTS: Project[] = [
       "Designed an information hierarchy that keeps reservations one tap away on mobile",
       "Built a featured-dishes section with lightweight, dependency-free image transitions",
       "Managed shared UI state with Redux across the menu and reservation flows",
+    ],
+    results: [
+      "Landing page delivered with public source code — demonstrating responsive layout and Redux state management patterns",
     ],
   },
   {
@@ -160,6 +253,9 @@ export const PROJECTS: Project[] = [
       "Used precision-recall curves and F1 scores to evaluate classifier performance beyond raw accuracy",
       "Applied resampling techniques to improve recall on the minority fraud class",
     ],
+    results: [
+      "XGBoost achieved highest F1 on minority fraud class after SMOTE resampling — outperforming baseline logistic regression",
+    ],
   },
   {
     slug: "react-jobs",
@@ -180,6 +276,9 @@ export const PROJECTS: Project[] = [
       "Built dynamic multi-criteria filtering without a backend query layer",
       "Designed a job-posting form flow with clear inline validation",
       "Kept the listing UI fast and scannable for a developer audience",
+    ],
+    results: [
+      "Open-source demo with full source on GitHub — illustrating form validation and dynamic filter patterns in plain React",
     ],
   },
 ];

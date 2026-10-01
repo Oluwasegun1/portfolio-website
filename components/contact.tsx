@@ -260,7 +260,8 @@ export default function Contact() {
         >
           <div className="rounded-2xl border border-border p-6">
             <div className="mb-4 flex items-center gap-2">
-              <span className="relative flex h-2.5 w-2.5">
+              {/* Ping is decorative — "Available for work" text conveys the status */}
+              <span className="relative flex h-2.5 w-2.5" aria-hidden="true">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
                 <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-success" />
               </span>

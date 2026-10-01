@@ -35,12 +35,12 @@ function BackToTop() {
   return (
     <motion.button
       onClick={scrollUp}
-      aria-label="Back to top"
+      aria-label="Back to top of page"
       className="focus-ring flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-accent hover:text-foreground"
       whileHover={{ scale: 1.08, y: -2 }}
       whileTap={{ scale: 0.95 }}
     >
-      <ArrowUp className="h-4 w-4" />
+      <ArrowUp className="h-4 w-4" aria-hidden="true" />
     </motion.button>
   );
 }
@@ -98,12 +98,12 @@ export default function Footer() {
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label={label}
+                aria-label={`${label} (opens in new tab)`}
                 className="focus-ring flex h-9 w-9 items-center justify-center rounded-xl border border-border text-muted-foreground transition-all duration-200 hover:border-primary/50 hover:bg-accent hover:text-foreground"
                 whileHover={{ scale: 1.08, y: -2 }}
                 whileTap={{ scale: 0.95 }}
               >
-                <Icon className="h-4 w-4" />
+                <Icon className="h-4 w-4" aria-hidden="true" />
               </motion.a>
             ))}
             <div className="ml-1">

@@ -43,9 +43,15 @@ function Typewriter({ words }: { words: string[] }) {
   }, [displayText, isDeleting, wordIndex, words]);
 
   return (
-    <span className="gradient-text font-display">
+    // aria-live="polite" tells screen readers to announce the current role
+    // when it updates, without interrupting ongoing speech
+    <span aria-live="polite" aria-atomic="true" className="gradient-text font-display">
       {displayText}
-      <span className="animate-cursor-blink ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[1px] rounded-sm bg-primary align-middle" />
+      {/* Decorative blinking cursor — hidden from AT */}
+      <span
+        aria-hidden="true"
+        className="animate-cursor-blink ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[1px] rounded-sm bg-primary align-middle"
+      />
     </span>
   );
 }
@@ -148,7 +154,8 @@ export default function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <span className="relative flex h-2 w-2">
+            {/* Animated ping is decorative — hide from screen readers */}
+            <span className="relative flex h-2 w-2" aria-hidden="true">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
             </span>
@@ -230,13 +237,15 @@ export default function Hero() {
         </div>
 
         {/* Right — identity card, hidden on small screens to avoid competing with the intro */}
-        <div className="hidden justify-self-center lg:flex lg:justify-self-end">
+        {/* aria-hidden: the terminal widget is a visual metaphor, not primary content */}
+        <div className="hidden justify-self-center lg:flex lg:justify-self-end" aria-hidden="true">
           <IdentityCard />
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — aria-hidden: purely decorative, keyboard users use Tab/arrow keys */}
       <motion.div
+        aria-hidden="true"
         className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

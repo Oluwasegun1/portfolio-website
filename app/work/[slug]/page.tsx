@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
 import { notFound } from "next/navigation";
-import { ArrowLeft, ArrowRight, ExternalLink, Github, CheckCircle2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, ExternalLink, Github, CheckCircle2, Lock, Lightbulb, TrendingUp } from "lucide-react";
 import { PROJECTS, getProjectBySlug, getAdjacentProjects } from "@/lib/projects";
 
 export function generateStaticParams() {
@@ -14,6 +14,8 @@ export function generateStaticParams() {
 // routing layer instead of rendering a dynamic page that could mis-report its status
 export const dynamicParams = false;
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://oluwasegun-portfolio.vercel.app";
+
 export async function generateMetadata({
   params,
 }: {
@@ -23,13 +25,25 @@ export async function generateMetadata({
   const project = getProjectBySlug(slug);
   if (!project) return {};
 
+  const pageUrl = `${SITE_URL}/work/${slug}`;
+  const ogImage = project.image.startsWith("/")
+    ? `${SITE_URL}${project.image}`
+    : project.image;
+
   return {
     title: project.title,
-    description: project.description,
+    description: `${project.tagline} — ${project.description.slice(0, 120)}…`,
+    alternates: { canonical: pageUrl },
     openGraph: {
       title: `${project.title} · Case Study`,
-      description: project.description,
-      images: [{ url: project.image }],
+      description: `${project.tagline} — ${project.description.slice(0, 120)}…`,
+      url: pageUrl,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: `${project.title} preview` }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} · Case Study`,
+      description: `${project.tagline} — ${project.description.slice(0, 120)}…`,
     },
   };
 }
@@ -76,7 +90,7 @@ export default async function ProjectPage({
             View Live
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
-          {project.githubUrl && (
+          {project.githubUrl && !project.privateNote && (
             <a
               href={project.githubUrl}
               target="_blank"
@@ -89,11 +103,19 @@ export default async function ProjectPage({
           )}
         </div>
 
+        {/* Private / corporate notice */}
+        {project.privateNote && (
+          <div className="mb-10 flex items-start gap-3 rounded-xl border border-border bg-accent/30 px-5 py-4">
+            <Lock className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
+            <p className="text-sm leading-relaxed text-muted-foreground">{project.privateNote}</p>
+          </div>
+        )}
+
         {/* Cover image */}
         <div className="relative mb-12 aspect-video overflow-hidden rounded-2xl border border-border">
           <Image
             src={project.image}
-            alt={`${project.title} preview`}
+            alt={`${project.title} — project screenshot`}
             fill
             priority
             className="object-cover"
@@ -128,7 +150,7 @@ export default async function ProjectPage({
         </div>
 
         {/* Highlights */}
-        <div className="mb-16">
+        <div className="mb-12">
           <h2 className="font-display mb-4 text-xl font-bold">What I Built</h2>
           <ul className="space-y-3">
             {project.highlights.map((highlight) => (
@@ -139,6 +161,45 @@ export default async function ProjectPage({
             ))}
           </ul>
         </div>
+
+        {/* Decisions & Trade-offs */}
+        {project.decisions && project.decisions.length > 0 && (
+          <div className="mb-12">
+            <div className="mb-4 flex items-center gap-2.5">
+              <Lightbulb className="h-5 w-5 text-primary" />
+              <h2 className="font-display text-xl font-bold">Decisions &amp; Trade-offs</h2>
+            </div>
+            <div className="space-y-5">
+              {project.decisions.map((decision) => (
+                <div
+                  key={decision.title}
+                  className="rounded-xl border border-border bg-accent/20 p-5"
+                >
+                  <p className="mb-2 text-sm font-semibold text-foreground">{decision.title}</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{decision.rationale}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Results */}
+        {project.results && project.results.length > 0 && (
+          <div className="mb-16">
+            <div className="mb-4 flex items-center gap-2.5">
+              <TrendingUp className="h-5 w-5 text-primary" />
+              <h2 className="font-display text-xl font-bold">Results</h2>
+            </div>
+            <ul className="space-y-3">
+              {project.results.map((result) => (
+                <li key={result} className="flex items-start gap-3">
+                  <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span className="text-sm leading-relaxed text-muted-foreground">{result}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
 
         {/* Prev / next */}
         <div className="grid gap-3 border-t border-border pt-8 sm:grid-cols-2">

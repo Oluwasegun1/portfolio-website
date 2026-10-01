@@ -4,7 +4,7 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpRight, Github } from "lucide-react";
+import { ArrowUpRight, Github, Lock } from "lucide-react";
 import { motion, useInView } from "framer-motion";
 import { PROJECTS, type Project } from "@/lib/projects";
 import { cn } from "@/lib/utils";
@@ -32,12 +32,12 @@ function ProjectImage({ project, priority }: { project: Project; priority?: bool
       />
       <Image
         src={project.image}
-        alt={`${project.title} preview`}
+        alt={`${project.title} — project screenshot`}
         fill
         priority={priority}
         onLoad={() => setLoaded(true)}
         className={cn(
-          "object-cover transition-all duration-700 group-hover:scale-105",
+          "object-cover transition-all duration-700 motion-safe:group-hover:scale-105",
           loaded ? "opacity-100" : "opacity-0"
         )}
         sizes="(max-width: 768px) 100vw, 50vw"
@@ -78,7 +78,11 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               <h3 className="font-display text-lg font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
                 {project.title}
               </h3>
-              <ArrowUpRight className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+              {/* Arrow is decorative — the card itself is the interactive element */}
+              <ArrowUpRight
+                className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground transition-all duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary"
+                aria-hidden="true"
+              />
             </div>
             <p className="text-sm font-medium text-muted-foreground">{project.tagline}</p>
             <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground">
@@ -90,8 +94,32 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
               <TechBadge key={tech} label={tech} />
             ))}
           </div>
+
+          {/* GitHub / private indicator — shown outside the card Link so it's a separate click target */}
         </div>
       </Link>
+
+      {/* Source / private label — rendered outside the card Link so it's a separate interactive element */}
+      <div className="mt-2 flex items-center gap-2 px-1">
+        {project.githubUrl && !project.privateNote ? (
+          <a
+            href={project.githubUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            className="focus-ring inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/40 hover:text-foreground"
+            aria-label={`View ${project.title} source on GitHub (opens in new tab)`}
+          >
+            <Github className="h-3 w-3" aria-hidden="true" />
+            GitHub
+          </a>
+        ) : project.privateNote ? (
+          <span className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-1 text-xs text-muted-foreground">
+            <Lock className="h-3 w-3" aria-hidden="true" />
+            Private — company code
+          </span>
+        ) : null}
+      </div>
     </motion.div>
   );
 }
@@ -130,9 +158,10 @@ export default function Projects() {
           href="https://github.com/Oluwasegun1"
           target="_blank"
           rel="noopener noreferrer"
+          aria-label="View more projects on GitHub (opens in new tab)"
           className="focus-ring inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
         >
-          <Github className="h-4 w-4" />
+          <Github className="h-4 w-4" aria-hidden="true" />
           More on GitHub
         </a>
       </div>

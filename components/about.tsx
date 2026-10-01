@@ -24,28 +24,33 @@ const PRINCIPLES = [
   {
     icon: Zap,
     title: "Performance-first",
-    description: "Route splitting, TanStack Query caching, and PWA offline storage — measurable, not assumed.",
+    description:
+      "Route splitting, TanStack Query caching, and PWA offline storage ship measurable results — not assumptions. Core Web Vitals tuning is a standard step before every feature release.",
   },
   {
     icon: Eye,
     title: "Systems thinker",
-    description: "Registry-driven architectures and shared component libraries that scale across teams.",
+    description:
+      "Registry-driven reporting cut new-report delivery from ~2 days to under 2 hours. Shared component libraries remove duplicate UI work across teams.",
   },
   {
     icon: Accessibility,
     title: "AI-integrated engineering",
-    description: "Shipped 3 production AI assistants: trip planning, financial copilot, and HR policy Q&A.",
+    description:
+      "Shipped 3 production AI assistants: Paddi AI for trip planning, a copilot with voice input on Gopaddi Books, and Ally for HR policy Q\u0026A with escalation analytics.",
   },
   {
     icon: GitBranch,
     title: "Security-conscious",
-    description: "End-to-end payload encryption, RBAC across 30+ modules, and disciplined mutation validation.",
+    description:
+      "End-to-end payload encryption (RSA-OAEP + AES-256-GCM) via Axios interceptors, RBAC across 30+ modules, and keyboard-navigation tested UI components.",
   },
 ];
 
-/** Animated counter — eases from 0 to `target` over a fixed duration, not a fixed step */
+/** Counter — SSR renders the real target value so crawlers and slow devices always see a number.
+ * On the client it animates from 0 to target once the element is in view. */
 function Counter({ target, suffix }: { target: number; suffix: string }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number | null>(null);
   const ref = useRef<HTMLSpanElement>(null);
   const isInView = useInView(ref, { once: true });
   const shouldReduceMotion = useReducedMotion();
@@ -54,7 +59,6 @@ function Counter({ target, suffix }: { target: number; suffix: string }) {
     if (!isInView) return;
 
     if (shouldReduceMotion) {
-      // Deferred to the next frame so state isn't set synchronously within the effect body
       const raf = requestAnimationFrame(() => setCount(target));
       return () => cancelAnimationFrame(raf);
     }
@@ -75,9 +79,13 @@ function Counter({ target, suffix }: { target: number; suffix: string }) {
     return () => cancelAnimationFrame(frame);
   }, [isInView, target, shouldReduceMotion]);
 
+  // Before hydration / animation, render the real number so SSR output and
+  // crawlers never see "0"
+  const display = count ?? target;
+
   return (
     <span ref={ref}>
-      {count}
+      {display}
       {suffix}
     </span>
   );
@@ -119,21 +127,26 @@ export default function About() {
             <span className="font-medium text-foreground">Lagos, Nigeria</span>, building across four
             concurrent products in the Gopaddi travel, hospitality, finance, and HR ecosystem.
           </p>
-          <p className="mb-6 leading-relaxed text-muted-foreground">
+          <p className="mb-4 leading-relaxed text-muted-foreground">
             I&apos;ve shipped three production AI assistants, architected a registry-driven reporting
             engine that cut new-report delivery from two days to under two hours, and built RBAC gating
             30+ modules — all while maintaining the{" "}
             <span className="font-medium text-foreground">Jungle shared component library</span> adopted
             across all four products.
           </p>
+          <p className="mb-6 leading-relaxed text-muted-foreground">
+            I also run a{" "}
+            <span className="font-medium text-foreground">frontend engineering bootcamp</span>, mentoring
+            early-career developers on React, TypeScript, and production-ready engineering practices.
+          </p>
           <a
-            href="/OLUWASEGUN IFEOLUWA OGUNBANJO RESUME.pdf"
+            href="/OLUWASEGUN%20IFEOLUWA%20OGUNBANJO%20RESUME.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="focus-ring inline-flex w-fit items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-semibold text-foreground transition-colors hover:border-primary/50 hover:bg-accent"
           >
             Download Resume
-            <Download className="h-4 w-4" />
+            <Download className="h-4 w-4" aria-hidden="true" />
           </a>
         </motion.div>
 
@@ -148,7 +161,11 @@ export default function About() {
           </h4>
           {PRINCIPLES.map((principle) => (
             <div key={principle.title} className="flex items-start gap-4">
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-accent/50 text-primary">
+              {/* Icon is decorative — the title provides the label */}
+              <div
+                aria-hidden="true"
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-accent/50 text-primary"
+              >
                 <principle.icon className="h-4 w-4" />
               </div>
               <div>
@@ -168,10 +185,17 @@ export default function About() {
         initial={{ opacity: 0, y: 20 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
         transition={{ duration: 0.5, delay: 0.35 }}
+        role="list"
+        aria-label="Career metrics"
       >
         {STATS.map((stat) => (
-          <div key={stat.label} className="flex flex-col items-center gap-2 px-4 py-6 text-center">
-            <stat.icon className="h-5 w-5 text-primary" />
+          <div
+            key={stat.label}
+            role="listitem"
+            className="flex flex-col items-center gap-2 px-4 py-6 text-center"
+          >
+            {/* Icon is decorative — aria-label on the value+label conveys the meaning */}
+            <stat.icon className="h-5 w-5 text-primary" aria-hidden="true" />
             <div className="font-display text-3xl font-bold text-foreground">
               <Counter target={stat.value} suffix={stat.suffix} />
             </div>

@@ -115,7 +115,7 @@ export default function Header() {
                       evt.preventDefault();
                       scrollTo(item.href);
                     }}
-                    aria-current={isActive ? "true" : undefined}
+                    aria-current={isActive ? "page" : undefined}
                     className={cn(
                       "focus-ring relative inline-block rounded-lg px-3 py-2 text-sm font-medium transition-colors duration-200",
                       isActive ? "text-foreground" : "text-muted-foreground hover:text-foreground"
@@ -162,7 +162,7 @@ export default function Header() {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            aria-label="Toggle theme"
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
             className="focus-ring relative h-9 w-9 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
